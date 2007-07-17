@@ -1,0 +1,140 @@
+<library>
+  <script src="collections.js"/>
+  <script src="utils.js"/>
+  
+  <resource name="loading" src="images/loadingAnimation.gif"/>
+  
+  <class name="BorderedBox" extends="drawview">
+    <attribute name="borderColor" value="0"
+               setter="this.borderColor=borderColor; redraw()"/>
+    <attribute name="borderWidth" value="1"/>
+    <attribute name="radius" value="0"/>
+    <attribute name="dash" value="null"/>
+    <method event="oninit">redraw()</method>
+    <method event="onwidth">redraw()</method>
+    <method event="onheight">redraw()</method>
+    <method event="onborderWidth">redraw()</method>
+    <method name="redraw">
+      clear();
+      beginPath();
+      if (dash)
+        withDash([5], function(){drawRect(0, 0, width-1, height-1, radius, radius)});
+      else
+        drawRect(0, 0, width-1, height-1, radius, radius);
+      this.lineWidth = borderWidth;
+      stroke();
+    </method>
+  </class>
+  
+  <class name="RoundBox" extends="drawview">
+    <attribute name="radius" value="0"/>
+    <method event="oninit">redraw()</method>
+    <method event="onwidth">redraw()</method>
+    <method event="onheight">redraw()</method>
+    <method name="redraw">
+      clear();
+      beginPath();
+      drawRect(0, 0, width-1, height-1, radius, radius);
+      fill();
+    </method>
+  </class>
+  
+  <class name="FilterEffect" extends="node">
+    <attribute name="apply" value="true"/>
+    <attribute name="applied" value="false"/>
+    <attribute name="filterName" type="string"/>
+    <method event="onapply">
+      if (applied == apply) return;
+      this.applied = apply;
+      var mc = parent.getMCRef();
+      if (!mc || !mc.filters) return;
+      var filter = this['filter'] = this['filter'] || createFilter();
+      var filters = mc.filters; //Array.without(mc.filters, filter);
+      if (apply)
+        filters = filters.concat([filter]);
+      else
+        filters = [];
+      mc.filters = filters;
+    </method>
+    <method name="createFilter">
+      var filter = new flash.filters[filterName+'Filter']();
+      return filter;
+    </method>
+  </class>
+  
+  <class name="DropShadowFilterEffect" extends="FilterEffect">
+    <method name="createFilter">
+      var filter = new flash.filters.DropShadowFilter();
+      filter.alpha = 0.6;
+      return filter;
+    </method>
+  </class>
+  
+  <class name="GlowFilterEffect" extends="FilterEffect">
+    <attribute name="color" type="color" value="0xffff00"/>
+    <attribute name="blur" value="30"/>
+    <method name="createFilter">
+      var filter = new flash.filters.GlowFilter(this.color, 1);
+      filter.blurX = filter.blurY = this.blur;
+      return filter;
+    </method>
+  </class>
+  
+  <class name="GrayScaleEffect" extends="FilterEffect">
+    <method name="createFilter">
+      var offset = 127;
+      var filter = new flash.filters.ColorMatrixFilter();
+      filter.matrix = new Array(
+      .16, .16, .16, 0, offset,
+      .16, .16, .16, 0, offset,
+      .16, .16, .16, 0, offset,
+      0, 0, 0, 1, 0);
+      return filter;
+    </method>
+  </class>
+  
+  <class name="boxframe" extends="BorderedBox" width="100%" height="100%"/>
+  
+  <class name="fancyborder">
+    <view resource="images/northeast.png" x="${parent.width-10}" y="-10"/>
+    <view resource="images/southeast.png" x="${parent.width-10}" y="${parent.height-10}"/>
+    <view resource="images/northwest.png" x="-10" y="-10"/>
+    <view resource="images/southwest.png" x="-10" y="${parent.height-10}"/>
+    <view resource="images/north.png" x="10" y="-10" width="${parent.width-20}" stretches="width"/>
+    <view resource="images/south.png" x="10" y="${parent.height}" width="${parent.width-20}" stretches="width"/>
+    <view resource="images/west.png" x="-10" y="10" height="${parent.height-20}" stretches="height"/>
+    <view resource="images/east.png" x="${parent.width}" y="10" height="${parent.height-20}" stretches="height"/>
+  </class>
+  
+  <class name="Link" extends="text"
+         onmouseover="setAttribute('label', '&lt;u&gt;'+plainLabel+'&lt;/u&gt;');
+                      setAttribute('fgcolor', 0x4040ff)"
+         onmouseout="setText(this.plainLabel); setAttribute('fgcolor', 0)">
+    <attribute name="plainLabel" value="$once{this.getText()}"/>
+  </class>
+  
+  <class name="ScaledImage" stretches="both">
+    <method event="onload">recompute()</method>
+    <method event="onwidth" reference="parent">recompute()</method>
+    <method event="onheight" reference="parent">recompute()</method>
+    <method name="recompute">
+      if (!this['__LZmovieClipRef']) return;
+      if (!__LZmovieClipRef.mc['lmc']) return;
+      var mc = __LZmovieClipRef.mc.lmc;
+      var scale = Math.min(parent.width / mc._width, parent.height / mc._height);
+      setWidth(mc._width * scale);
+      setHeight(mc._height * scale);
+      setAttribute('unstretchedwidth', mc._width);
+      setAttribute('unstretchedheight', mc._height);
+      //info(parent.width, parent.height, mc._width, mc._height, width, height);
+    </method>
+  </class>
+  
+  <class name="ZoomRect" extends="BorderedBox">
+    <attribute name="vanish" value="0"/>
+    <method event="onvanish">
+      if (vanish==1)
+        this.destroy()
+    </method>
+  </class>
+</library>
