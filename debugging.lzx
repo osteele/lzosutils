@@ -1,0 +1,4 @@
+<library>
+  <script src="inspection.js"/>
+  <script src="debugger-patches.js"/>
+</library>
