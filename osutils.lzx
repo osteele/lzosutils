@@ -1,6 +1,9 @@
 <library>
   <script src="collections.js"/>
   <script src="utils.js"/>
+  <script src="draw-utils.js"/>
+  <script src="view-utils.js"/>
+  <include href="filter-effects.js"/>
   
   <resource name="loading" src="images/loadingAnimation.gif"/>
   
@@ -36,60 +39,6 @@
       beginPath();
       drawRect(0, 0, width-1, height-1, radius, radius);
       fill();
-    </method>
-  </class>
-  
-  <class name="FilterEffect" extends="node">
-    <attribute name="apply" value="true"/>
-    <attribute name="applied" value="false"/>
-    <attribute name="filterName" type="string"/>
-    <method event="onapply">
-      if (applied == apply) return;
-      this.applied = apply;
-      var mc = parent.getMCRef();
-      if (!mc || !mc.filters) return;
-      var filter = this['filter'] = this['filter'] || createFilter();
-      var filters = mc.filters; //Array.without(mc.filters, filter);
-      if (apply)
-        filters = filters.concat([filter]);
-      else
-        filters = [];
-      mc.filters = filters;
-    </method>
-    <method name="createFilter">
-      var filter = new flash.filters[filterName+'Filter']();
-      return filter;
-    </method>
-  </class>
-  
-  <class name="DropShadowFilterEffect" extends="FilterEffect">
-    <method name="createFilter">
-      var filter = new flash.filters.DropShadowFilter();
-      filter.alpha = 0.6;
-      return filter;
-    </method>
-  </class>
-  
-  <class name="GlowFilterEffect" extends="FilterEffect">
-    <attribute name="color" type="color" value="0xffff00"/>
-    <attribute name="blur" value="30"/>
-    <method name="createFilter">
-      var filter = new flash.filters.GlowFilter(this.color, 1);
-      filter.blurX = filter.blurY = this.blur;
-      return filter;
-    </method>
-  </class>
-  
-  <class name="GrayScaleEffect" extends="FilterEffect">
-    <method name="createFilter">
-      var offset = 127;
-      var filter = new flash.filters.ColorMatrixFilter();
-      filter.matrix = new Array(
-      .16, .16, .16, 0, offset,
-      .16, .16, .16, 0, offset,
-      .16, .16, .16, 0, offset,
-      0, 0, 0, 1, 0);
-      return filter;
     </method>
   </class>
   

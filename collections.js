@@ -161,3 +161,9 @@ String.prototype.strip = function() {
         ;
     return 0 == i && j == this.length-1 ? this : this.slice(i, j+1);
 }
+
+String.prototype.pluralize = function(count) {
+    if (arguments.length && count == 1)
+        return this;
+    return this+'s';
+}
