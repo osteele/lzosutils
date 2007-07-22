@@ -1,12 +1,11 @@
 <library>
   <script src="collections.js"/>
-  <script src="utils.js"/>
+  <script src="functional.js"/>
+  <script src="osutils.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>
-  <include href="filter-effects.js"/>
-  
-  <resource name="loading" src="images/loadingAnimation.gif"/>
-  
+  <include href="filter-effects.lzx"/>
+
   <class name="BorderedBox" extends="drawview">
     <attribute name="borderColor" value="0"
                setter="this.borderColor=borderColor; redraw()"/>
@@ -28,7 +27,7 @@
       stroke();
     </method>
   </class>
-  
+
   <class name="RoundBox" extends="drawview">
     <attribute name="radius" value="0"/>
     <method event="oninit">redraw()</method>
@@ -41,27 +40,16 @@
       fill();
     </method>
   </class>
-  
+
   <class name="boxframe" extends="BorderedBox" width="100%" height="100%"/>
-  
-  <class name="fancyborder">
-    <view resource="images/northeast.png" x="${parent.width-10}" y="-10"/>
-    <view resource="images/southeast.png" x="${parent.width-10}" y="${parent.height-10}"/>
-    <view resource="images/northwest.png" x="-10" y="-10"/>
-    <view resource="images/southwest.png" x="-10" y="${parent.height-10}"/>
-    <view resource="images/north.png" x="10" y="-10" width="${parent.width-20}" stretches="width"/>
-    <view resource="images/south.png" x="10" y="${parent.height}" width="${parent.width-20}" stretches="width"/>
-    <view resource="images/west.png" x="-10" y="10" height="${parent.height-20}" stretches="height"/>
-    <view resource="images/east.png" x="${parent.width}" y="10" height="${parent.height-20}" stretches="height"/>
-  </class>
-  
+
   <class name="Link" extends="text"
          onmouseover="setAttribute('label', '&lt;u&gt;'+plainLabel+'&lt;/u&gt;');
                       setAttribute('fgcolor', 0x4040ff)"
          onmouseout="setText(this.plainLabel); setAttribute('fgcolor', 0)">
     <attribute name="plainLabel" value="$once{this.getText()}"/>
   </class>
-  
+
   <class name="ScaledImage" stretches="both">
     <method event="onload">recompute()</method>
     <method event="onwidth" reference="parent">recompute()</method>
@@ -78,7 +66,7 @@
       //info(parent.width, parent.height, mc._width, mc._height, width, height);
     </method>
   </class>
-  
+
   <class name="ZoomRect" extends="BorderedBox">
     <attribute name="vanish" value="0"/>
     <method event="onvanish">

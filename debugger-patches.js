@@ -4,6 +4,7 @@ Debug.internalProperty = function(str) {
     var c = str.charAt(0);
     return c == '$' || c == '_';
 }
+
 Debug.inspectInternal = function (obj, showInternalProperties) {
   var si = (typeof(showInternalProperties) != 'undefined')?showInternalProperties: this.showInternalProperties;
   var hasProto = (obj['__proto__']);
