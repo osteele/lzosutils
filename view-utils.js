@@ -7,9 +7,23 @@ Array.destroyAll = function(items) {
         items[i].destroy();
 }
 
-LzNode.prototype.set = LzNode.prototype.setAttribute;
+LzNode.prototype.set = function(name, value) {
+    if (typeof name == 'object') {
+        var hash = name;
+        for (name in hash)
+            this.setAttribute(name, hash[name]);
+    } else
+        this.setAttribute(name, value);
+}
 
 LzNode.prototype.to = function(name, value, duration, relative, rest) {
+    if (typeof name == 'object') {
+        var hash = name;
+        for (name in hash)
+            // shifted by one
+            this.animate(name, hash[name], value, duration, relative);
+        return;
+    }
     var durationNames = {slow: 600, normal: 400, fast: 200};
     if (arguments.length < 3)
         duration = 'normal';
