@@ -117,6 +117,7 @@ Hash.keys = function(hash) {
 Hash.merge = function(target, source) {
     for (var key in source)
         target[key] = source[key];
+    return target;
 }
 
 Hash.toQueryString = function(hash) {
