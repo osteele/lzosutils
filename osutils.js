@@ -14,6 +14,19 @@ if (LzBrowser.getLoadURL().indexOf(':8080') >= 0 || LzBrowser.getLoadURL().index
 LzLoadQueue.maxOpen = 10000;
 //LzLoadQueue.__LZmonitorState = true;
 
+function setTimeout(fn, ms) {
+    var obj = {run:fn};
+    LzTimer.addTimer(new LzDelegate(obj, 'run'), ms);
+    return obj;
+}
+
+function clearTimeout(obj) {
+    obj.run = function(){};
+}
+
+Function.prototype.delayed = function(ms) {
+    setTimeout(this, ms);
+}
 
 /*
  * Image processing
