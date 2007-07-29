@@ -114,7 +114,7 @@ Debug.inspectInternal = function (obj, showInternalProperties) {
   // indent
   wid = (wid + 2)
     // ows
-    var collectionValues, collected;
+    var collectionValues, collected = false;
     function flushRepeats() {
         if (collected)
             description += '  ' + collected.join(', ') + ': ' + collectionValues + '\n';
