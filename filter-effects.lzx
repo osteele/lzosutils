@@ -5,9 +5,9 @@
     <attribute name="filterName" type="string"/>
     <method event="onapply">
       if (applied == apply) return;
-      this.applied = apply;
       var mc = parent.getMCRef();
-      if (!mc || !mc.filters) return;
+      if (!mc || !mc['filters']) return;
+      this.applied = apply;
       var filter = this['filter'] = this['filter'] || createFilter();
       var filters = mc.filters; //Array.without(mc.filters, filter);
       if (apply)
@@ -21,7 +21,7 @@
       return filter;
     </method>
   </class>
-  
+
   <class name="DropShadowFilterEffect" extends="FilterEffect">
     <method name="createFilter">
       var filter = new flash.filters.DropShadowFilter();
@@ -29,7 +29,7 @@
       return filter;
     </method>
   </class>
-  
+
   <class name="GlowFilterEffect" extends="FilterEffect">
     <attribute name="color" type="color" value="0xffff00"/>
     <attribute name="blur" value="30"/>
@@ -39,7 +39,7 @@
       return filter;
     </method>
   </class>
-  
+
   <class name="GrayScaleEffect" extends="FilterEffect">
     <method name="createFilter">
       var offset = 127;
