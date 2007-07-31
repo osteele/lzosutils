@@ -124,7 +124,7 @@ Hash.toQueryString = function(hash) {
     var words = [];
     for (name in hash) {
         var value = hash[name];
-        words.push([name, '=', value].join(''));
+        words.push([name, '=', LzBrowser.urlEscape(value)].join(''));
     }
     return words.length ? words.join('&') : '';
 }
