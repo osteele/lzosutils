@@ -1,4 +1,5 @@
 <library>
   <script src="inspection.js"/>
   <script src="debugger-patches.js"/>
+  <script src="simple-logging.js"/>
 </library>
