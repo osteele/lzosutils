@@ -43,7 +43,7 @@ Array.index = function(ar, item) {
     return null;
 }
 
-Array.invoke = function(fname) {
+Array.invoke = function(ar, fname) {
     var result = new Array(ar.length);
     Array.each(ar, function(item, ix) {
         result[ix] = item[fname].apply(item);
