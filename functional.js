@@ -1,4 +1,8 @@
-var forEach = Array.each;
+Function.I = function(x) {return x};
+
+function forEach(fn, ar, context) {
+    return Array.each(ar, fn, context);
+}
 
 function map(fn, ar, context) {
     return Array.map(ar, fn, context);
@@ -18,7 +22,7 @@ function pluck(name) {
 
 function invoke(name, args) {
     args = [].slice.call(args, 0);
-    return function() {
-        return this[name].apply(this, args.concat([].slice.call(arguments, 0)));
+    return function(object) {
+        return object[name].apply(object, args.concat([].slice.call(arguments, 0)));
     }
 }
