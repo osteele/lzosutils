@@ -58,14 +58,6 @@ LzView.prototype.destroyDirectInstances = function(klass) {
     }
 }
 
-LzView.prototype.eachDirectInstance = function(klass, fn) {
-    for (var i in this.subviews) {
-        var e = this.subviews[i];
-        if (e.class == klass)
-            fn(e);
-    }
-}
-
 LzView.prototype.moveTo = function(x, y) {
     this.setX(x);
     this.setY(y);
@@ -89,4 +81,37 @@ LzNode.prototype.hide = function() {
 LzNode.prototype.toggle = function(name) {
     if (!arguments.length) name = 'visible';
     this.set(name, !this[name]);
+}
+
+
+/*
+ * Iterators
+ */
+
+LzView.prototype.eachDirectInstance = function(klass, fn) {
+    for (var i in this.subviews) {
+        var e = this.subviews[i];
+        if (e.class == klass)
+            fn(e);
+    }
+}
+
+LzView.prototype.eachPath = function(klass, fn) {
+    for (var i in this.subviews) {
+        var e = this.subviews[i];
+        if (e instanceof klass)
+            fn(e);
+        else
+            e.eachPath(klass, fn);
+    }
+}
+
+// only in this class
+LzView.prototype.eachSibling = function(fn, klass) {
+    var children = this.parent.subviews;
+    for (var i in children) {
+        var e = children[i];
+        if (e != this && e instanceof klass)
+            fn(e);
+    }
 }
