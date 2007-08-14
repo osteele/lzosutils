@@ -8,12 +8,17 @@ Array.destroyAll = function(items) {
 }
 
 LzNode.prototype.set = function(name, value) {
+    if (arguments.length < 2) value = true;
     if (typeof name == 'object') {
         var hash = name;
         for (name in hash)
             this.setAttribute(name, hash[name]);
     } else
         this.setAttribute(name, value);
+}
+
+LzNode.prototype.unset = function(name) {
+    this.set(name, false);
 }
 
 LzNode.prototype.to = function(name, value, duration, relative, rest) {
