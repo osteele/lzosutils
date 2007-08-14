@@ -249,6 +249,7 @@ var FlashBridge = function() {
 //     flash.external.ExternalInterface.addCallback("info", null, function(){
 //         info.apply(null, arguments);
 //     });
+    if (typeof flash == 'undefined') return;
     flash.external.ExternalInterface.addCallback("handleCallback",
                                                  this, this.handleCallback);
     this.register('info', function() {info.apply(null,  arguments)});
