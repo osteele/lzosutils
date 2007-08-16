@@ -2,88 +2,57 @@
  * Array utilities
  */
 
-Array.any = function(ar, fn) {
-    for (var i = 0 ; i < ar.length; i++)
-        if (fn(ar[i]))
-            return true;
-    return false;
-}
-
-Array.compact = function(ar) {
+Array.prototype.compact = function() {
     var results = [];
-    Array.each(ar, function(item) {
+    this.forEach(function(item) {
         item == null || item == undefined || results.push(item);
     });
     return results;
 }
 
-Array.detect = function(ar, fn) {
-    for (var i = 0; i < ar.length; i++)
-        if (fn(ar[i], i))
-            return ar[i];
+Array.prototype.detect = function(fn, thisObject) {
+    for (var i = 0; i < this.length; i++)
+        if (fn.call(thisObject, this[i], i, this))
+            return this[i];
     return null;
 }
 
-Array.each = function(ar, fn, target) {
-    for (var i = 0; i < ar.length; i++)
-        fn.call(target, ar[i], i);
-}
-
-Array.find = function(ar, item) {
-    for (var i = 0; i < ar.length; i++)
-        if (ar[i] == item)
+Array.prototype.find = function(item) {
+    for (var i = 0; i < this.length; i++)
+        if (this[i] == item)
             return true;
     return false;
 }
 
-Array.index = function(ar, item) {
-    for (var i = 0; i < ar.length; i++)
-        if (ar[i] == item)
-            return i;
-    return null;
-}
-
-Array.invoke = function(ar, fname) {
-    var result = new Array(ar.length);
-    Array.each(ar, function(item, ix) {
-        result[ix] = item[fname].apply(item);
+Array.invoke = function(name) {
+    var result = new Array(this.length);
+    var args = [].slice.call(arguments, 1);
+    this.forEach(function(item, ix) {
+        result[ix] = item[name].apply(item, args);
     });
     return result;
 }
 
-Array.map = function(ar, fn) {
-    var result = new Array(ar.length);
-    Array.each(ar, function(item, ix) {
-        result[ix] = fn(item, ix);
+Array.prototype.pluck = function(name) {
+    var result = new Array(this.length);
+    this.forEach(function(item, ix) {
+        result[ix] = item[name];
     });
     return result;
 }
 
-Array.pluck = function(ar, pname) {
-    var result = new Array(ar.length);
-    Array.each(ar, function(item, ix) {
-        result[ix] = item[pname];
-    });
-    return result;
+Array.prototype.select = function(fn, thisObject) {
+    return this.filter(fn, thisObject);
 }
 
-Array.select = function(ar, fn) {
-    var result = [];
-    Array.each(ar, function(item, ix) {
-        if (fn(item, ix))
-            result.push(item);
-    });
-    return result;
-}
-
-Array.sum = function(ar) {
+Array.prototype.sum = function() {
     var sum = 0;
-    Array.each(ar, function(n) {sum += n});
+    this.forEach(function(n) {sum += n});
     return sum;
 }
 
-Array.without = function(ar, item) {
-    return Array.select(ar, function(it) {
+Array.prototype.without = function(item) {
+    return this.filter(function(it) {
         return it != item;
     });
 }
@@ -94,24 +63,44 @@ Array.without = function(ar, item) {
  */
 
 Array.prototype.indexOf = function(searchElement/*, fromIndex*/) {
-    return Array.index(this, searchElement);
+    var len = this.length;
+    for (var i = 0; i < len; i++)
+        if (ar[i] == searchElement)
+            return i;
+    return -1;
 }
 
 // lastIndexOf() - returns the index of the given item's last occurrence.
 
 Array.prototype.every = function() {
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        if (!fn.call(thisObject, this[i], i, this))
+            return false;
+    return true;
 }
 
 Array.prototype.some = function(fn, thisObject) {
-    return Array.any(this, fn, thisObject);
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        if (fn.call(thisObject, this[i], i, this))
+            return true;
+    return false;
 }
 
-Array.prototype.filter = function() {
-    return Array.select(this, fn, thisObject);
+Array.prototype.filter = function(fn, thisObject) {
+    var len = this.length,
+        results = [];
+    for (var i = 0 ; i < len; i++)
+        if (fn.call(thisObject, this[i], i, this))
+            results.push(this[i]);
+    return results;
 }
 
 Array.prototype.forEach = function(fn, thisObject) {
-    Array.each(this, fn, thisObject);
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        fn.call(thisObject, this[i], i, this);
 }
 
 Array.prototype.map = function(fn, thisObject) {
@@ -121,6 +110,13 @@ Array.prototype.map = function(fn, thisObject) {
         result[i] = fn.call(thisObject, this[i], i, this);
     return result;
 }
+
+
+/*
+ * Prototype synonyms
+ */
+
+Array.prototype.each = Array.prototype.forEach;
 
 
 /*

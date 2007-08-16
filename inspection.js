@@ -4,7 +4,7 @@ Debug.printChildren = function(node, indent) {
     indent = indent || '';
     var children = node['subviews'] || [];
     Debug.write(indent + node.toString() + (children.length ? ' {' : ''));
-    Array.each(children, function(child) {
+    children.forEach(function(child) {
         Debug.printChildren(child, indent + '  ');
     });
     children.length && Debug.write(indent + '}');

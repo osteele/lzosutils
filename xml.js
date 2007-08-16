@@ -3,10 +3,10 @@
 function XMLTraverse(xml, path) {
     var steps = path.split(' ');
     var nodes = [xml];
-    Array.each(steps, function(step) {
+    steps.forEach(function(step) {
         var results = [];
-        Array.each(nodes, function(node) {
-            Array.each(node.childNodes, function(child) {
+        nodes.forEach(function(node) {
+            node.childNodes.forEach(function(child) {
                 if (child.nodeType == 1 && child.nodeName == step)
                     results.push(child);
             });
@@ -26,7 +26,7 @@ function xml2js(node) {
         node.childNodes);
     if (childElements.length) {
         var obj = {};
-        Array.each(childElements, function(child) {
+        childElements.forEach(function(child) {
             var o = xml2js(child);
             var v = obj[child.nodeName];
             if (v) {

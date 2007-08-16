@@ -1,15 +1,15 @@
 Function.I = function(x) {return x};
 
-function forEach(fn, ar, context) {
-    return Array.each(ar, fn, context);
+function forEach(fn, ar, thisObject) {
+    return ar.forEach(fn, thisObject);
 }
 
-function map(fn, ar, context) {
-    return Array.map(ar, fn, context);
+function map(fn, ar, thisObject) {
+    return ar.map(fn, thisObject);
 }
 
-function filter(fn, ar, context) {
-    return Array.select(ar, fn, context);
+function filter(fn, ar, thisObject) {
+    return ar.filter(fn, thisObject);
 }
 
 var select = filter;
