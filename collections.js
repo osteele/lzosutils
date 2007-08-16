@@ -90,6 +90,40 @@ Array.without = function(ar, item) {
 
 
 /*
+ * JavaScript 1.6
+ */
+
+Array.prototype.indexOf = function(searchElement/*, fromIndex*/) {
+    return Array.index(this, searchElement);
+}
+
+// lastIndexOf() - returns the index of the given item's last occurrence.
+
+Array.prototype.every = function() {
+}
+
+Array.prototype.some = function(fn, thisObject) {
+    return Array.any(this, fn, thisObject);
+}
+
+Array.prototype.filter = function() {
+    return Array.select(this, fn, thisObject);
+}
+
+Array.prototype.forEach = function(fn, thisObject) {
+    Array.each(this, fn, thisObject);
+}
+
+Array.prototype.map = function(fn, thisObject) {
+    var len = this.length,
+        result = new Array(len);
+    for (var i = 0; i < len; i++)
+        result[i] = fn.call(thisObject, this[i], i, this);
+    return result;
+}
+
+
+/*
  * Hash utilities
  */
 
