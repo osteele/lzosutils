@@ -3,6 +3,7 @@
     <attribute name="apply" value="true"/>
     <attribute name="applied" value="false"/>
     <attribute name="filterName" type="string"/>
+    <attribute name="properties" value="{}"/>
     <method event="onapply">
       if (applied == apply) return;
       var mc = parent.getMCRef();
@@ -18,6 +19,8 @@
     </method>
     <method name="createFilter">
       var filter = new flash.filters[filterName+'Filter']();
+      for (var name in properties)
+        filter[name] = properties[name];
       return filter;
     </method>
   </class>
