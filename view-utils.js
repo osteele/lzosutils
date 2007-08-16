@@ -55,14 +55,14 @@ LzView.prototype.containsMouse = function() {
 }
 
 LzView.prototype.destroyDirectInstances = function(klass) {
+    var destroys = [];
     this.subviews.forEach(function(e) {
-        if (typeof e.destroyDirectInstances == 'undefined')
-            info('un', e);
         if (e instanceof klass)
-            e.destroy();
+            destroys.push(e);
         else
             e.destroyDirectInstances(klass);
     });
+    destroys.invoke('destroy');
 }
 
 LzView.prototype.moveTo = function(x, y) {

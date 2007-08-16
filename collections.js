@@ -24,7 +24,7 @@ Array.prototype.find = function(item) {
     return false;
 }
 
-Array.invoke = function(name) {
+Array.prototype.invoke = function(name) {
     var result = new Array(this.length);
     var args = [].slice.call(arguments, 1);
     this.forEach(function(item, ix) {
