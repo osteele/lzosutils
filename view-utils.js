@@ -55,12 +55,14 @@ LzView.prototype.containsMouse = function() {
 }
 
 LzView.prototype.destroyDirectInstances = function(klass) {
-    for (var i in this.subviews) {
-        var e = this.subviews[i];
-        if (e.class == klass)
+    this.subviews.forEach(function(e) {
+        if (typeof e.destroyDirectInstances == 'undefined')
+            info('un', e);
+        if (e instanceof klass)
             e.destroy();
-        e.destroyDirectInstances(klass);
-    }
+        else
+            e.destroyDirectInstances(klass);
+    });
 }
 
 LzView.prototype.moveTo = function(x, y) {
@@ -70,8 +72,7 @@ LzView.prototype.moveTo = function(x, y) {
 
 LzView.prototype.setFilter = function(filter) {
     var filters = [];
-    if (filter)
-        filters = [filter];
+    filter && filters.push(filter);
     this.getMCRef().filters = filters;
 }
 
@@ -94,29 +95,24 @@ LzNode.prototype.toggle = function(name) {
  */
 
 LzView.prototype.eachDirectInstance = function(klass, fn) {
-    for (var i in this.subviews) {
-        var e = this.subviews[i];
-        if (e.class == klass)
+    this.subviews.forEach(function(e) {
+        if (e instanceof klass)
             fn(e);
-    }
+    });
 }
 
 LzView.prototype.eachPath = function(klass, fn) {
-    for (var i in this.subviews) {
-        var e = this.subviews[i];
+    this.subviews.forEach(function(e) {
         if (e instanceof klass)
             fn(e);
         else
             e.eachPath(klass, fn);
-    }
+    });
 }
 
-// only in this class
 LzView.prototype.eachSibling = function(fn, klass) {
-    var children = this.parent.subviews;
-    for (var i in children) {
-        var e = children[i];
+    this.parent.subviews.forEach(function(e) {
         if (e != this && e instanceof klass)
             fn(e);
-    }
+    });
 }

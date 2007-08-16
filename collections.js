@@ -100,14 +100,16 @@ Array.prototype.filter = function(fn, thisObject) {
 Array.prototype.forEach = function(fn, thisObject) {
     var len = this.length;
     for (var i = 0 ; i < len; i++)
-        fn.call(thisObject, this[i], i, this);
+        if (typeof this[i] != 'undefined')
+            fn.call(thisObject, this[i], i, this);
 }
 
 Array.prototype.map = function(fn, thisObject) {
     var len = this.length,
         result = new Array(len);
     for (var i = 0; i < len; i++)
-        result[i] = fn.call(thisObject, this[i], i, this);
+        if (typeof this[i] != 'undefined')
+            result[i] = fn.call(thisObject, this[i], i, this);
     return result;
 }
 
