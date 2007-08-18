@@ -24,6 +24,8 @@ Array.prototype.find = function(item) {
     return false;
 }
 
+Array.prototype.contains = Array.prototype.find;
+
 Array.prototype.invoke = function(name) {
     var result = new Array(this.length);
     var args = [].slice.call(arguments, 1);
@@ -127,7 +129,10 @@ Array.prototype.each = Array.prototype.forEach;
 
 function $H(data) {
     return {
-        keys: function() {return Hash.keys(data)}
+        each: function() {return Hash.each(data)},
+        keys: function() {return Hash.keys(data)},
+        toQueryString: function() {return Hash.toQueryString(data)},
+        values: function() {return Hash.values(data)}
     };
 }
 

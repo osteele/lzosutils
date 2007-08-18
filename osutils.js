@@ -24,8 +24,8 @@ function clearTimeout(obj) {
     obj.run = function(){};
 }
 
-Function.prototype.delayed = function(ms) {
-    setTimeout(this, ms);
+Function.prototype.delay = function(ms) {
+    setTimeout(this, arguments.length ? ms : 10);
 }
 
 /*
