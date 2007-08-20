@@ -1,5 +1,5 @@
 /*
- * Views
+ * Nodes
  */
 
 Array.destroyAll = function(items) {
@@ -43,6 +43,11 @@ LzNode.prototype.animators = function(hash, duration) {
         self.animate(name, value, duration);
     });
 }
+
+
+/*
+ * Views
+ */
 
 // LFC version is off by one
 LzView.prototype.containsPt = function(x, y) {
