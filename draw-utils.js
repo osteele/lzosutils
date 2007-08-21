@@ -35,18 +35,21 @@ LzDrawView.prototype.withDash = function(intervals, fn) {
     this.lineTo = ol;
 }
 
-LzDrawView.prototype.drawRect = function(x, y, w, h, r0, r1) {
-    if (arguments.length <= 4)
-        r0 = r1 = 0;
-    else if (arguments.length <= 5)
-        r1 = r0;
-    this.moveTo(x+r0, y);
-    this.lineTo(x+w-r0, y);
-    this.quadraticCurveTo(x+w, y, x+w, y+r1);
-    this.lineTo(x+w, y+h-r1);
-    this.quadraticCurveTo(x+w, h, x+w-r0, y+h);
-    this.lineTo(x+r0, y+h);
-    this.quadraticCurveTo(x, y+h, x, y+h-r1);
-    this.lineTo(x, y+r1);
-    this.quadraticCurveTo(x, y, x+r0, y);
+LzDrawView.prototype.drawRect = function(x, y, w, h, rx0, ry0, rx1, ry1) {
+    var x1 = x+w, y1 = y+h;
+    switch (arguments.length) {
+    case 4: rx0 = 0;
+    case 5: ry0 = rx0;
+    case 6: rx1 = rx0;
+    case 7: ry1 = ry0;
+    }
+    this.moveTo(x+rx0, y);
+    this.lineTo(x1-rx1, y);
+    this.quadraticCurveTo(x1, y, x1, y+ry0);
+    this.lineTo(x1, y1-ry1);
+    this.quadraticCurveTo(x1, y1, x1-rx1, y1);
+    this.lineTo(x+rx0, y1);
+    this.quadraticCurveTo(x, y1, x, y1-ry1);
+    this.lineTo(x, y+ry0);
+    this.quadraticCurveTo(x, y, x+rx0, y);
 }
