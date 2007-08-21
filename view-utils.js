@@ -99,25 +99,25 @@ LzNode.prototype.toggle = function(name) {
  * Iterators
  */
 
-LzView.prototype.eachDirectInstance = function(klass, fn) {
+LzView.prototype.eachDirectInstance = function(klass, fn, thisObject) {
     this.subviews.forEach(function(e) {
         if (e instanceof klass)
-            fn(e);
+            fn.call(thisObject, e);
     });
 }
 
-LzView.prototype.eachPath = function(klass, fn) {
+LzView.prototype.eachPath = function(klass, fn, thisObject) {
     this.subviews.forEach(function(e) {
         if (e instanceof klass)
-            fn(e);
+            fn.call(thisObject, e);
         else
-            e.eachPath(klass, fn);
+            e.eachPath(klass, fn, thisObject);
     });
 }
 
-LzView.prototype.eachSibling = function(fn, klass) {
+LzView.prototype.eachSibling = function(fn, klass, thisObject) {
     this.parent.subviews.forEach(function(e) {
         if (e != this && e instanceof klass)
-            fn(e);
+            fn.call(thisObject, e);
     });
 }
