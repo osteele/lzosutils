@@ -131,6 +131,7 @@ function $H(data) {
     return {
         each: function() {return Hash.each(data)},
         keys: function() {return Hash.keys(data)},
+        merge: function(other) {return Hash.merge(data, other)},
         toQueryString: function() {return Hash.toQueryString(data)},
         values: function() {return Hash.values(data)}
     };

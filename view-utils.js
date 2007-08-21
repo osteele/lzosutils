@@ -121,3 +121,26 @@ LzView.prototype.eachSibling = function(fn, klass, thisObject) {
             fn.call(thisObject, e);
     });
 }
+
+/*
+ * Scrim
+ */
+
+function createScrim(referenceView, attributes) {
+    var parentView = canvas;
+    attributes = arguments.length >= 2 ? attributes : {bgcolor:0};
+    var view = new LzView(parentView, {width:parentView.width,height:parentView.height,opacity:0});
+    var left = referenceView.getAttributeRelative('x', parentView),
+        top = referenceView.getAttributeRelative('y', parentView),
+        right = left + referenceView.width,
+        bottom = top + referenceView.height;
+    function makeView(x, y, width, height) {
+        //new LzView(view, {x:x,y:y,width:width,height:height,bgcolor:0});
+        new LzView(view, $H({x:x,y:y,width:width,height:height}).merge(attributes));
+    }
+    makeView(0, 0, canvas.width, top);
+    makeView(0, top, left, bottom-top);
+    makeView(right, top, parentView.width-right, bottom-top);
+    makeView(0, bottom, parentView.width, parentView.height-bottom);
+    return view;
+}
