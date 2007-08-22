@@ -1,0 +1,12 @@
+<canvas>
+  <include href="debugging.lzx"/>
+  <include href="osutils.lzx"/>
+
+  <view id="v" width="100" height="200" bgcolor="#fef" align="center" valign="middle"/>
+
+  <script>
+    setTimeout(function(){
+      createScrim(v, {round:25,soft:false,bgcolor:0}).set('opacity', 1);
+    },10)
+  </script>
+</canvas>
