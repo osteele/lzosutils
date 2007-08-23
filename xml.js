@@ -7,7 +7,7 @@ function XMLTraverse(xml, path) {
         var results = [];
         nodes.forEach(function(node) {
             node.childNodes.forEach(function(child) {
-                if (child.nodeType == 1 && child.nodeName == step)
+                if (child.nodeType == 1 && (step == '*' || child.nodeName == step))
                     results.push(child);
             });
         });
