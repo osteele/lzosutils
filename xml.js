@@ -1,6 +1,8 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
 function XMLTraverse(xml, path) {
+    if (xml instanceof Array)
+        return xml.forEach(function(item) {return XMLTraverse(item, path)});
     var steps = path.split(' ');
     var nodes = [xml];
     steps.forEach(function(step) {
