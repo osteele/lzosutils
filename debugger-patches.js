@@ -2,7 +2,19 @@ function $reportUndefinedVariable() {
 #pragma "warnUndefinedReferences=false"
 }
 
-Debug.showInternalProperties = false;
+function $reportUndefinedProperty() {
+#pragma "warnUndefinedReferences=false"
+}
+
+function $reportUndefinedObjectProperty (filename, lineNumber, propertyName) {
+#pragma "warnUndefinedReferences=false"
+    if (filename == 'base/basewindow.lzx') return;
+  if (! arguments.callee._dbg_recursive_call) {
+      arguments.callee._dbg_recursive_call = true;
+      $reportSourceWarning(filename, lineNumber, "undefined object does not have a property '" + propertyName + "'");
+      arguments.callee._dbg_recursive_call = false;
+  }
+}
 
 Debug.internalProperty = function(str) {
     var c = str.charAt(0);
