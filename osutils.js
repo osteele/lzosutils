@@ -56,6 +56,31 @@ LzView.prototype.removeBitmapBackground = function() {
     mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
 }
 
+// Gallery.galleries.MINE.pages[0].view.image.getBitmapString().length
+LzView.prototype.getBitmapString = function() {
+    var mc = this.getMCRef();
+    var bitmap = this.bitmap = new flash.display.BitmapData(mc._width, mc._height, true, 0x80FFFFFF);
+    bitmap.draw(mc);
+    var s = new Array(2*bitmap.width*bitmap.height);
+    info(s, s.length);
+    var last = null, repeat, uniques = [];
+    for (var y = 0, i = 0; y < bitmap.height; y++)
+        for (var x = 0; x < bitmap.width; x++) {
+            var color = bitmap.getPixel32(x, y);
+            if (color == last) {
+                ++repeat;
+            } else if (last == null) {
+                last = color;
+                repeat = 1;
+            } else {
+                var hi = (color >> 16) & 0xffff, lo = color & 0xffff;
+                s[i++] = (hi).toString(16);
+                s[i++] = (lo).toString(16);
+            }
+        }
+    s.length = i;
+    return s.join('');
+}
 
 function animateRect(sourceView, targetView) {
     return;
