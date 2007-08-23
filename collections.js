@@ -59,6 +59,17 @@ Array.prototype.without = function(item) {
     });
 }
 
+/*
+ * Monadic Arrays
+ */
+
+Array.toList = function(ar) {
+    return ar instanceof Array ? ar : [ar];
+}
+
+Array.fromList = function(ar) {
+    return ar instanceof Array ? ar[0] : ar;
+}
 
 /*
  * JavaScript 1.6
@@ -67,7 +78,7 @@ Array.prototype.without = function(item) {
 Array.prototype.indexOf = function(searchElement/*, fromIndex*/) {
     var len = this.length;
     for (var i = 0; i < len; i++)
-        if (ar[i] == searchElement)
+        if (this[i] == searchElement)
             return i;
     return -1;
 }
