@@ -181,14 +181,14 @@ function createScrim(referenceView, options) {
                 v.fill();
                 return;
             }
-            var r=round,w=25;
+            var r=round,w=r;
             // top, bottom
             gs(r,0,v.width-2*r,w,0,1);
             gs(r,v.height-w,v.width-2*r,w,0,-1);
             // left, right
             gs(0,r,w,v.height-2*w,1,0);
             gs(v.width-w,w,w,v.height-2*w,-1,0);
-            // tl
+            // tl, tr, bl, br
             gss(0,0,w,w,-1,-1);
             gss(v.width-w,0,w,w,1,-1);
             gss(0,v.height-w,w,w,-1,1);
@@ -206,15 +206,14 @@ function createScrim(referenceView, options) {
             v.fill();
         }
         function gss(x0,y0,w,h,gdx,gdy) {
-            var gx0 = 0, gx1 = gdx;
-            var gy0 = 0, gy1 = gdy;
+            var gx0 = -.5, gx1 = .5;
+            var gy0 = -.5, gy1 = .5;
             var x1 = x0 + w, y1 = y0 + h;
-            if (gx1 < 0) {gx0 = 1; gx1 = 0}
-            if (gy1 < 0) {gy0 = 1; gy1 = 0}
+            if (gdx < 0) {gx0 = 1; gx1 = 0}
+            if (gdy < 0) {gy0 = 1; gy1 = 0}
             v.beginPath();
             v.rect(x0,y0,w,h);
 
-            //var g = v.createRadialGradient(x0+w*gx0,y0+h*gy0,0,x0+w*gx1,y0+h*gy1,10);
             var g = v.createRadialGradient(x0+2*w*gx0,y0+2*h*gy0,10,x0+2*w*gx1,y0+2*h*gy1,100);
 
             v.globalAlpha = 0;
