@@ -171,6 +171,7 @@ Dragger.start = function(view) {
         view: view,
         start: {x: canvas.getMouse('x'), y: canvas.getMouse('y')},
         last: {x: canvas.getMouse('x'), y: canvas.getMouse('y')},
+        virtual: {x: view.x, y: view.y},
         resizing: false
     };
     if (view['resizeHandle'] && view.resizeHandle.containsMouse()) {
@@ -186,6 +187,7 @@ Dragger.handleMouseMove = function(view, x, y) {
     var state = Dragger.state;
     var dx = x - state.last.x;
     var dy = y - state.last.y;
+    state.last = {x: x, y: y};
     if (dx == 0 && dy == 0) return;
     if (view != state.view) return;
     if (state.resizing) {
@@ -200,10 +202,12 @@ Dragger.handleMouseMove = function(view, x, y) {
         view.setWidth(width);
         view.setHeight(height);
     } else {
-        view.setX(view.x + dx);
-        view.setY(view.y + dy);
+        var x = state.virtual.x += dx;
+        var y = state.virtual.y += dy;
+        var container = canvas, margin = 20;
+        view.setX(Math.max(margin-view.width, Math.min(canvas.width-margin, x)));
+        view.setY(Math.max(margin-view.height, Math.min(canvas.height-margin, y)));
     }
-    state.last = {x: x, y: y};
 }
 
 
