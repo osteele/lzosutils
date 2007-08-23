@@ -3,10 +3,10 @@
   <drawview width="200" height="100" align="center" valign="middle">
     <method event="oninit">
     beginPath();
-    drawRect(0, 0, width, height,25, 25);
-    this.strokeStyle = 0xff0000;
+    drawRect(-1, -1, width+2, height+2, 2);
+    this.strokeStyle = 0x808080;
     this.fillStyle = 0xff0000;
-    fill();
+    stroke();
     </method>
   </drawview>
 </canvas>

@@ -6,7 +6,7 @@
 
   <script>
     setTimeout(function(){
-      createScrim(v, {round:25,soft:false,bgcolor:0}).set('opacity', 1);
+      createScrim(v, {round:25,soft:true,bgcolor:0}).set('opacity', 1);
     },10)
   </script>
 </canvas>
