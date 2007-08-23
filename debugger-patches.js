@@ -1,3 +1,7 @@
+function $reportUndefinedVariable() {
+#pragma "warnUndefinedReferences=false"
+}
+
 Debug.showInternalProperties = false;
 
 Debug.internalProperty = function(str) {
@@ -6,6 +10,7 @@ Debug.internalProperty = function(str) {
 }
 
 Debug.inspectInternal = function (obj, showInternalProperties) {
+#pragma "warnUndefinedReferences=false"
   var si = (typeof(showInternalProperties) != 'undefined')?showInternalProperties: this.showInternalProperties;
   var hasProto = (obj['__proto__']);
   var opl = this.printLength;
