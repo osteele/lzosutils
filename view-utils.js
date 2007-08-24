@@ -275,7 +275,11 @@ function findBestRelativePosition(view, reference, container, margin) {
     var x = x1 + view.width > containerRight - margin && x0 >= containerLeft + margin
         ? x0
         : x1;
-    var y = reference.getAttributeRelative('y', canvas);
+    var y = refTop;
+    // if the reference is clipped on the top, align it with the reference's bottom
+    // if there's room
+    if (y > reference.getAttributeRelative('y', container) && refBottom - view.height >= containerTop + margin)
+        y = refBottom - view.height;
     // if there's not room to the left or right but there is above or below,
     // place it there
     if (x + view.width > containerRight - margin
