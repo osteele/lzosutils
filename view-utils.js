@@ -1,10 +1,8 @@
-/*
- * Nodes
- */
+/* Copyright 2006-2007 by Oliver Steele.  All rights reserved. */
 
-Array.destroyAll = function(items) {
-    items.invoke('destroy');
-}
+/*
+ * Attributes
+ */
 
 LzNode.prototype.set = function(name, value) {
     if (arguments.length < 2) value = true;
@@ -39,11 +37,25 @@ LzNode.prototype.to = function(name, value, duration, relative, rest) {
     return this;
 }
 
+LzNode.prototype.toggle = function(name) {
+    if (!arguments.length) name = 'visible';
+    this.set(name, !this[name]);
+}
+
 LzNode.prototype.animators = function(hash, duration) {
     var self = this;
     Hash.each(hash, function(name, value) {
         self.animate(name, value, duration);
     });
+}
+
+
+/*
+ * Nodes
+ */
+
+Array.destroyAll = function(items) {
+    items.invoke('destroy');
 }
 
 
@@ -60,6 +72,8 @@ LzView.prototype.containsPt = function(x, y) {
 LzView.prototype.containsMouse = function() {
     return this.containsPt(this.getMouse('x'), this.getMouse('y'));
 }
+
+LzView.prototype.containsMouse.dependencies = LzView.prototype.getMouse.dependencies;
 
 LzView.prototype.destroyDirectInstances = function(klass) {
     var destroys = [];
@@ -91,11 +105,6 @@ LzNode.prototype.hide = function() {
     this.setVisible(false);
 }
 
-LzNode.prototype.toggle = function(name) {
-    if (!arguments.length) name = 'visible';
-    this.set(name, !this[name]);
-}
-
 
 /*
  * Iterators
@@ -124,23 +133,27 @@ LzView.prototype.eachSibling = function(fn, klass, thisObject) {
     });
 }
 
+
 /*
  * Scrim
  */
 
-function getAbsoluteBounds(view, container) {
+// Return the bounds of view, clipped to container if present.
+// (Container is not itself clipped.)
+LzView.prototype.getAbsoluteBounds = function(container) {
+    var view = this;
     var left = view.getAttributeRelative('x', canvas),
         top = view.getAttributeRelative('y', canvas),
         right = left + view.width,
         bottom = top + view.height;
-    if (arguments.length >= 2) {
-        var cb = getAbsoluteBounds(container);
-        left = Math.max(left, cb.left);
-        top = Math.max(top, cb.top);
-        right = Math.min(right, cb.right);
-        bottom = Math.min(bottom, cb.bottom);
+    if (container) {
+        var cb = container.getAbsoluteBounds();
+        left = Math.max(left, cb.x);
+        top = Math.max(top, cb.y);
+        right = Math.min(right, cb.x + cb.width);
+        bottom = Math.min(bottom, cb.y + cb.height);
     }
-    return {left:left, top:top, right:right, bottom:bottom};
+    return {x:left, y:top, width:right-left, height:bottom-top};
 }
 
 function createScrim(referenceView, options) {
@@ -150,17 +163,17 @@ function createScrim(referenceView, options) {
         round = options['round'] || 0,
         soft = options['soft'];
     var view = new LzView(parentView, {width:parentView.width,height:parentView.height,opacity:0});
-    var bounds = getAbsoluteBounds(referenceView, container);
+    var bounds = referenceView.getAbsoluteBounds(container);
     if (soft && round) {
-        bounds.left -= round;
-        bounds.top -= round;
-        bounds.right += round;
-        bounds.bottom += round;
+        bounds.x -= round;
+        bounds.y -= round;
+        bounds.width += 2*round;
+        bounds.height += 2*round;
     }
-    var left = bounds.left,
-        right = bounds.right,
-        top = bounds.top,
-        bottom = bounds.bottom;
+    var left = bounds.x,
+        right = bounds.x + bounds.width,
+        top = bounds.y,
+        bottom = bounds.y + bounds.height;
     var attributes = $H({}).merge(options);
     delete attributes.container;
     delete attributes.round;
@@ -236,4 +249,48 @@ function createScrim(referenceView, options) {
         new LzDelegate(v, 'onmf', v, 'oninit');
     }
     return view;
+}
+
+
+/*
+ * Relative Position
+ */
+
+// view must be within canvas
+function findBestRelativePosition(view, reference, container, margin) {
+    var refBounds = reference.getAbsoluteBounds(container),
+        containerBounds = container.getAbsoluteBounds();
+    var refLeft = refBounds.x,
+        refTop = refBounds.y,
+        refRight = refBounds.x + refBounds.width,
+        refBottom = refBounds.y + refBounds.height;
+    var containerLeft = containerBounds.x,
+        containerTop = containerBounds.y,
+        containerRight = containerBounds.x + containerBounds.width,
+        containerBottom = containerBounds.y + containerBounds.height;
+    var x0 = refLeft - view.width - margin,
+        x1 = refRight + margin;
+    // prefer the right, unless there's no room on the right and
+    // there is room on the left
+    var x = x1 + view.width > containerRight - margin && x0 >= containerLeft + margin
+        ? x0
+        : x1;
+    var y = reference.getAttributeRelative('y', canvas);
+    // if there's not room to the left or right but there is above or below,
+    // place it there
+    if (x + view.width > containerRight - margin
+       || y < containerTop || y + view.height > containerBottom) {
+        var y0 = refTop - view.height - margin,
+            y1 = refBottom + margin,
+            y_ = y0 >= containerTop + margin ? y0
+            : y1 + view.height + margin < containerBottom ? y1
+            : y;
+        if (y != y_) {
+            y = y_;
+            x = refLeft - containerLeft > containerRight - refRight
+                ? refRight - view.width
+                : refLeft;
+        }
+    }
+    return {x:x, y:y};
 }

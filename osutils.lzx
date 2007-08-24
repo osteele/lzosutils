@@ -4,6 +4,8 @@
   <script src="osutils.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>
+  <script src="draggable.js"/>
+  <script src="static-layouts.js"/>
   <include href="filter-effects.lzx"/>
 
   <class name="BorderedBox" extends="drawview">

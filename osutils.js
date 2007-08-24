@@ -14,6 +14,11 @@ if (LzBrowser.getLoadURL().indexOf(':8080') >= 0 || LzBrowser.getLoadURL().index
 LzLoadQueue.maxOpen = 10000;
 //LzLoadQueue.__LZmonitorState = true;
 
+
+/*
+ * Functions
+ */
+
 function setTimeout(fn, ms) {
     var obj = {run:fn};
     LzTimer.addTimer(new LzDelegate(obj, 'run'), ms);
@@ -27,6 +32,20 @@ function clearTimeout(obj) {
 Function.prototype.delay = function(ms) {
     setTimeout(this, arguments.length ? ms : 10);
 }
+
+Function.prototype.defer = Function.prototype.delay;
+
+var Event = {
+    observe: function(target, eventName, fn) {
+        new LzDelegate({run:fn}, 'run', target, eventName);
+    }
+};
+
+LzNode.prototype.observe = function(eventName, fn) {
+    info('register', eventName, this);
+    return new LzDelegate({run:fn}, 'run', this, eventName);
+};
+
 
 /*
  * Image processing
@@ -157,57 +176,6 @@ String.prototype.colorizeLinks = function() {
 
 LzBrowser.makeHTMLCallback = function(fname, arg) {
     return ['asfunction:_root.', fname, ',', arg].join('');
-}
-
-
-/*
- * Dragger
- */
-
-Dragger = {}
-
-Dragger.start = function(view) {
-    var state = Dragger.state = {
-        view: view,
-        start: {x: canvas.getMouse('x'), y: canvas.getMouse('y')},
-        last: {x: canvas.getMouse('x'), y: canvas.getMouse('y')},
-        virtual: {x: view.x, y: view.y},
-        resizing: false
-    };
-    if (view['resizeHandle'] && view.resizeHandle.containsMouse()) {
-        state.resizing = true;
-        state.ratio = view.width / view.height;
-        state.startSize = {width: view.width, height: view.height};
-    }
-}
-
-Dragger.stop = function() {}
-
-Dragger.handleMouseMove = function(view, x, y) {
-    var state = Dragger.state;
-    var dx = x - state.last.x;
-    var dy = y - state.last.y;
-    state.last = {x: x, y: y};
-    if (dx == 0 && dy == 0) return;
-    if (view != state.view) return;
-    if (state.resizing) {
-        var width = w = Math.max(40, state.startSize.width + canvas.getMouse('x') - state.start.x);
-        var height = h = Math.max(40, state.startSize.height + canvas.getMouse('y') - state.start.y);
-        var ratio = width / height;
-        if (ratio < state.ratio)
-            width = height * state.ratio;
-        else
-            height = width / state.ratio;
-        //info(w, h, ratio, width, height, width/height, state.ratio)
-        view.setWidth(width);
-        view.setHeight(height);
-    } else {
-        var x = state.virtual.x += dx;
-        var y = state.virtual.y += dy;
-        var container = canvas, margin = 20;
-        view.setX(Math.max(margin-view.width, Math.min(canvas.width-margin, x)));
-        view.setY(Math.max(margin-view.height, Math.min(canvas.height-margin, y)));
-    }
 }
 
 

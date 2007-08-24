@@ -1,0 +1,33 @@
+<canvas width="800" height="600">
+  <include href="debugging.lzx"/>
+  <include href="osutils.lzx"/>
+
+  <view id="neighbor" width="200" height="300" bgcolor="green"
+        opacity=".5"
+         onmousedown="Dragger.start(this); dragState.apply()"
+         onmouseup="Dragger.stop(this); dragState.remove()">
+    <state name="dragState">
+      <attribute name="_" value="${f(Dragger.handleMouseMove(this,
+                                 canvas.getMouse('x'),
+                                 canvas.getMouse('y')))}"/>
+    </state>
+    <view name="resizeHandle" width="20" height="20" align="right" valign="bottom" bgcolor="black"/>
+  </view>
+
+  <view id="ref" width="100" height="200" bgcolor="blue"
+         onmousedown="Dragger.start(this); dragState.apply()"
+         onmouseup="Dragger.stop(this); dragState.remove()">
+    <state name="dragState">
+      <attribute name="_" value="${f(Dragger.handleMouseMove(this,
+                                 canvas.getMouse('x'),
+                                 canvas.getMouse('y')))}"/>
+    </state>
+  </view>
+  <script>
+    ref.makeDraggable();
+    function f() {
+      var pos = findBestRelativePosition(neighbor, ref, canvas, 10);
+      neighbor.set({x: pos.x, y: pos.y});
+    }
+  </script>
+</canvas>
