@@ -259,12 +259,12 @@ function createScrim(referenceView, options) {
 // view must be within canvas
 function findBestRelativePosition(view, reference, container, margin) {
     var refBounds = reference.getAbsoluteBounds(container),
-        containerBounds = container.getAbsoluteBounds();
-    var refLeft = refBounds.x,
+        refLeft = refBounds.x,
         refTop = refBounds.y,
         refRight = refBounds.x + refBounds.width,
         refBottom = refBounds.y + refBounds.height;
-    var containerLeft = containerBounds.x,
+    var containerBounds = container.getAbsoluteBounds(),
+        containerLeft = containerBounds.x,
         containerTop = containerBounds.y,
         containerRight = containerBounds.x + containerBounds.width,
         containerBottom = containerBounds.y + containerBounds.height;

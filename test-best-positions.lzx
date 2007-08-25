@@ -14,18 +14,20 @@
     <view name="resizeHandle" width="20" height="20" align="right" valign="bottom" bgcolor="black"/>
   </view>
 
-  <view id="refContainer" bgcolor="blue" opacity=".1">
-  <view id="ref" width="100" height="200" bgcolor="blue"
-         onmousedown="Dragger.start(this); dragState.apply()"
-         onmouseup="Dragger.stop(this); dragState.remove()">
-    <state name="dragState">
-      <attribute name="_" value="${f(Dragger.handleMouseMove(this,
-                                 canvas.getMouse('x'),
-                                 canvas.getMouse('y')))}"/>
-    </state>
+  <view id="refContainer">
+    <view width="100%" height="100%" bgcolor="blue" opacity=".1"/>
+    <view id="ref" width="100" height="200" bgcolor="blue"
+          onmousedown="Dragger.start(this); dragState.apply()"
+          onmouseup="Dragger.stop(this); dragState.remove()">
+      <state name="dragState">
+        <attribute name="_" value="${f(Dragger.handleMouseMove(this,
+                                   canvas.getMouse('x'),
+                                   canvas.getMouse('y')))}"/>
+      </state>
+      <view name="resizeHandle" width="20" height="20" align="right" valign="bottom" bgcolor="black"/>
+    </view>
   </view>
-  </view>
-  
+
   <script>
     refContainer.set({x: 0, y: 10, width: 704, height: 565});
     //ref.set({x: 326, y: -115, width: 208.421052631579, height: 528});
