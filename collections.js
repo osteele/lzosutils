@@ -173,9 +173,11 @@ Hash.toQueryString = function(hash) {
     var words = [];
     for (name in hash) {
         var value = hash[name];
-        words.push([name, '=', LzBrowser.urlEscape(value)].join(''));
+        typeof value == 'function' ||
+            words.push([name, '=', LzBrowser.urlEscape(value)].join(''));
     }
-    return words.length ? words.join('&') : '';
+    words.sort();
+    return words.join('&');
 }
 
 Hash.values = function(hash) {
@@ -190,6 +192,20 @@ Hash.values = function(hash) {
 /*
  * String utilities
  */
+
+
+String.prototype.escapeHTML = function() {
+    return (this.replace('&', '&amp;')
+            .replace('<', '&lt;')
+            .replace('>', '&gt;')
+            .replace('"', '&quot;'));
+}
+
+String.prototype.pluralize = function(count) {
+    if (arguments.length && count == 1)
+        return this;
+    return this+'s';
+}
 
 // +pattern+ is required to be a string; there's therefore really no point in
 // accepting a Function for +sub+.
@@ -212,8 +228,8 @@ String.prototype.strip = function() {
     return 0 == i && j == this.length-1 ? this : this.slice(i, j+1);
 }
 
-String.prototype.pluralize = function(count) {
-    if (arguments.length && count == 1)
-        return this;
-    return this+'s';
+String.prototype.truncate = function(length, ellipsis) {
+    return (this.length <= length
+            ? string
+            : string.slice(0, length) + ellipsis);
 }

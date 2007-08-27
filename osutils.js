@@ -48,6 +48,16 @@ LzNode.prototype.observe = function(eventName, fn) {
 
 
 /*
+ * Math
+ */
+
+// Pin x to the range [a, b], where m = 20
+Math.pinToRange = function(x, a, b) {
+    return Math.max(a, Math.min(b, x));
+}
+
+
+/*
  * Image processing
  */
 
