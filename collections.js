@@ -193,12 +193,46 @@ Hash.values = function(hash) {
  * String utilities
  */
 
+String.prototype.capitalize = function() {
+    return this.slice(0,1).toUpperCase() + this.slice(1);
+}
 
 String.prototype.escapeHTML = function() {
     return (this.replace('&', '&amp;')
             .replace('<', '&lt;')
             .replace('>', '&gt;')
             .replace('"', '&quot;'));
+}
+
+String.prototype.inflect = function(suffix) {
+    var index = this.indexOf(' ');
+    if (index >= 0)
+        return this.slice(0, index).inflect(suffix) + this.slice(index);
+    // pos == 'v', or vp has single word
+    var inflections = {'ed': {'set': 'set'}};
+    var key = this.toLowerCase();
+    var value = (inflections[suffix]||{})[key];
+    if (!value) {
+        value = key;
+        var lastChar = key.charAt(key.length-1);
+        info(0, key);
+        switch (lastChar) {
+        case 'y':
+            if (suffix == 'ed')
+                value = value.slice(0, value.length-1) + 'i';
+            break;
+        case 'e':
+            value = value.slice(0, value.length-1);
+            break;
+        }
+        if (key == value &&
+            "aeiou".indexOf(value.charAt(value.length-1)) < 0 &&
+            "aeiou".indexOf(value.charAt(value.length-2)) >= 0)
+            value += value.charAt(value.length-1);
+        value += suffix;
+    }
+    // TODO: capitalize
+    return value;
 }
 
 String.prototype.pluralize = function(count) {
@@ -233,3 +267,4 @@ String.prototype.truncate = function(length, ellipsis) {
             ? string
             : string.slice(0, length) + ellipsis);
 }
+
