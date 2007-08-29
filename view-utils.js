@@ -187,68 +187,70 @@ function createScrim(referenceView, options) {
     makeView(0, bottom, parentView.width, parentView.height-bottom);
     if (round) {
         var v = new LzDrawView(view, {x:left,y:top,width:right-left,height:bottom-top});
-        function f(){
-            if (!soft) {
-                v.rect(0,0,v.width,v.height);
-                v.rect(0,0,v.width,v.height,25);
-                v.fill();
-                return;
-            }
-            var r=round,w=r;
-            // top, bottom
-            gs(r,0,v.width-2*r,w,0,1);
-            gs(r,v.height-w,v.width-2*r,w,0,-1);
-            // left, right
-            gs(0,r,w,v.height-2*w,1,0);
-            gs(v.width-w,w,w,v.height-2*w,-1,0);
-            // tl, tr, bl, br
-            gss(0,0,w,w,-1,-1);
-            gss(v.width-w,0,w,w,1,-1);
-            gss(0,v.height-w,w,w,-1,1);
-            gss(v.width-w,v.height-w,w,w,1,1);
-        }
-        function gs(x0,y0,w,h,gdx,gdy) {
-            var gx0 = 0, gx1 = gdx;
-            var gy0 = 0, gy1 = gdy;
-            var x1 = x0 + w, y1 = y0 + h;
-            if (gx1 < 0) {gx0 = 1; gx1 = 0}
-            if (gy1 < 0) {gy0 = 1; gy1 = 0}
-            v.beginPath();
-            v.rect(x0,y0,w,h);
-            grad(x0+w*gx0,y0+h*gy0,x0+w*gx1,y0+h*gy1);
-            v.fill();
-        }
-        function gss(x0,y0,w,h,gdx,gdy) {
-            var gx0 = -.5, gx1 = .5;
-            var gy0 = -.5, gy1 = .5;
-            var x1 = x0 + w, y1 = y0 + h;
-            if (gdx < 0) {gx0 = 1; gx1 = 0}
-            if (gdy < 0) {gy0 = 1; gy1 = 0}
-            v.beginPath();
-            v.rect(x0,y0,w,h);
-
-            var g = v.createRadialGradient(x0+2*w*gx0,y0+2*h*gy0,10,x0+2*w*gx1,y0+2*h*gy1,100);
-
-            v.globalAlpha = 0;
-            g.addColorStop(0, 0x000000);
-            v.globalAlpha = 1;
-            g.addColorStop(1, 0);
-            v.fillStyle = g;
-
-            v.fill();
-        }
-        function grad(x0,y0,x1,y1) {
-            var g = v.createLinearGradient(x0,y0,x1,y1)
-            v.globalAlpha = 1;
-            g.addColorStop(0, 0x000000);
-            v.globalAlpha = 0;
-            g.addColorStop(1, 0);
-            v.fillStyle = g;
-        }
         f.call(v);
         new LzDelegate(v, 'onmf', v, 'oninit');
     }
+    canvas.eachDirectInstance(LzDebugWindow, invoke('bringToFront'));
     return view;
+
+    function f(){
+        if (!soft) {
+            v.rect(0,0,v.width,v.height);
+            v.rect(0,0,v.width,v.height,25);
+            v.fill();
+            return;
+        }
+        var r=round, w=r;
+        // top, bottom
+        gs(r,0,v.width-2*r,w,0,1);
+        gs(r,v.height-w,v.width-2*r,w,0,-1);
+        // left, right
+        gs(0,r,w,v.height-2*w,1,0);
+        gs(v.width-w,w,w,v.height-2*w,-1,0);
+        // tl, tr, bl, br
+        gss(0,0,w,w,-1,-1);
+        gss(v.width-w,0,w,w,1,-1);
+        gss(0,v.height-w,w,w,-1,1);
+        gss(v.width-w,v.height-w,w,w,1,1);
+    }
+    function gs(x0,y0,w,h,gdx,gdy) {
+        var gx0 = 0, gx1 = gdx;
+        var gy0 = 0, gy1 = gdy;
+        var x1 = x0 + w, y1 = y0 + h;
+        if (gx1 < 0) {gx0 = 1; gx1 = 0}
+        if (gy1 < 0) {gy0 = 1; gy1 = 0}
+        v.beginPath();
+        v.rect(x0,y0,w,h);
+        grad(x0+w*gx0,y0+h*gy0,x0+w*gx1,y0+h*gy1);
+        v.fill();
+    }
+    function gss(x0,y0,w,h,gdx,gdy) {
+        var gx0 = -.5, gx1 = .5;
+        var gy0 = -.5, gy1 = .5;
+        var x1 = x0 + w, y1 = y0 + h;
+        if (gdx < 0) {gx0 = 1; gx1 = 0}
+        if (gdy < 0) {gy0 = 1; gy1 = 0}
+        v.beginPath();
+        v.rect(x0,y0,w,h);
+
+        var g = v.createRadialGradient(x0+2*w*gx0,y0+2*h*gy0,10,x0+2*w*gx1,y0+2*h*gy1,100);
+
+        v.globalAlpha = 0;
+        g.addColorStop(0, 0x000000);
+        v.globalAlpha = 1;
+        g.addColorStop(1, 0);
+        v.fillStyle = g;
+
+        v.fill();
+    }
+    function grad(x0,y0,x1,y1) {
+        var g = v.createLinearGradient(x0,y0,x1,y1)
+        v.globalAlpha = 1;
+        g.addColorStop(0, 0x000000);
+        v.globalAlpha = 0;
+        g.addColorStop(1, 0);
+        v.fillStyle = g;
+    }
 }
 
 
