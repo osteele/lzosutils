@@ -1,3 +1,5 @@
+/* Copyright 2007 by Oliver Steele.  All rights reserved. */
+
 /*
  * Array utilities
  */
@@ -225,9 +227,12 @@ String.prototype.inflect = function(suffix) {
             value = value.slice(0, value.length-1);
             break;
         }
+        var vowels = "aeiou";
         if (key == value &&
-            "aeiou".indexOf(value.charAt(value.length-1)) < 0 &&
-            "aeiou".indexOf(value.charAt(value.length-2)) >= 0)
+            // CVC -> VCVV
+            vowels.indexOf(value.charAt(value.length-1)) < 0 &&
+            vowels.indexOf(value.charAt(value.length-2)) >= 0 &&
+            vowels.indexOf(value.charAt(value.length-3)) < 0)
             value += value.charAt(value.length-1);
         value += suffix;
     }
@@ -267,4 +272,3 @@ String.prototype.truncate = function(length, ellipsis) {
             ? string
             : string.slice(0, length) + ellipsis);
 }
-
