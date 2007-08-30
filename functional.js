@@ -3,6 +3,14 @@
 Function.I = function(x) {return x};
 Function.K = function(x) {return function(){return x}};
 
+Function.prototype.bind = function(thisObject) {
+    var fn = this;
+    var args = [].slice.apply(arguments, 0).slice(1);
+    return function() {
+        return fn.apply(thisObject, args.concat([].slice(arguments, 1)));
+    }
+}
+
 function forEach(fn, ar, thisObject) {
     return ar.forEach(fn, thisObject);
 }
