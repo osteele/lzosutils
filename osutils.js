@@ -148,10 +148,6 @@ Number.prototype.toCardinal = function(max) {
     return this <= (max || Infinity) && cardinals[this] || String(this);
 }
 
-String.prototype.toCapitalized = function() {
-    return this.slice(0, 1).toUpperCase() + this.slice(1);
-}
-
 var Size = function(width, height) {
     this.width = width;
     this.height = height;

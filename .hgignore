@@ -1,0 +1,11 @@
+syntax: glob
+
+# temp files
+\.\#*
+\#*\#
+*.orig
+.e.scm.*
+.DS_Store
+
+# compiler output
+*.lzx.swf
