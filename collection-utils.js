@@ -123,7 +123,7 @@ Array.prototype.without = function(item) {
  */
 
 Array.prototype.commas = function() {
-    return this.invoke('toString').join(',');
+    return this.join(',');
 }
 
 
