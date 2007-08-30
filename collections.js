@@ -1,7 +1,61 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
 /*
- * Array utilities
+ * JavaScript 1.6 Array extensions
+ */
+
+Array.prototype.every = function() {
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        if (!fn.call(thisObject, this[i], i, this))
+            return false;
+    return true;
+}
+
+Array.prototype.some = function(fn, thisObject) {
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        if (fn.call(thisObject, this[i], i, this))
+            return true;
+    return false;
+}
+
+Array.prototype.filter = function(fn, thisObject) {
+    var len = this.length,
+        results = [];
+    for (var i = 0 ; i < len; i++)
+        if (fn.call(thisObject, this[i], i, this))
+            results.push(this[i]);
+    return results;
+}
+
+Array.prototype.forEach = function(fn, thisObject) {
+    var len = this.length;
+    for (var i = 0 ; i < len; i++)
+        if (typeof this[i] != 'undefined')
+            fn.call(thisObject, this[i], i, this);
+}
+
+Array.prototype.indexOf = function(searchElement/*, fromIndex*/) {
+    var len = this.length;
+    for (var i = 0; i < len; i++)
+        if (this[i] == searchElement)
+            return i;
+    return -1;
+}
+
+Array.prototype.map = function(fn, thisObject) {
+    var len = this.length,
+        result = new Array(len);
+    for (var i = 0; i < len; i++)
+        if (typeof this[i] != 'undefined')
+            result[i] = fn.call(thisObject, this[i], i, this);
+    return result;
+}
+
+
+/*
+ * Prototype Array extensions
  */
 
 Array.prototype.compact = function() {
@@ -18,6 +72,8 @@ Array.prototype.detect = function(fn, thisObject) {
             return this[i];
     return null;
 }
+
+Array.prototype.each = Array.prototype.forEach;
 
 Array.prototype.find = function(item) {
     for (var i = 0; i < this.length; i++)
@@ -61,6 +117,16 @@ Array.prototype.without = function(item) {
     });
 }
 
+
+/*
+ * Other array extensions
+ */
+
+Array.prototype.commas = function() {
+    return this.invoke('toString').join(',');
+}
+
+
 /*
  * Monadic Arrays
  */
@@ -72,68 +138,6 @@ Array.toList = function(ar) {
 Array.fromList = function(ar) {
     return ar instanceof Array ? ar[0] : ar;
 }
-
-/*
- * JavaScript 1.6
- */
-
-Array.prototype.indexOf = function(searchElement/*, fromIndex*/) {
-    var len = this.length;
-    for (var i = 0; i < len; i++)
-        if (this[i] == searchElement)
-            return i;
-    return -1;
-}
-
-// lastIndexOf() - returns the index of the given item's last occurrence.
-
-Array.prototype.every = function() {
-    var len = this.length;
-    for (var i = 0 ; i < len; i++)
-        if (!fn.call(thisObject, this[i], i, this))
-            return false;
-    return true;
-}
-
-Array.prototype.some = function(fn, thisObject) {
-    var len = this.length;
-    for (var i = 0 ; i < len; i++)
-        if (fn.call(thisObject, this[i], i, this))
-            return true;
-    return false;
-}
-
-Array.prototype.filter = function(fn, thisObject) {
-    var len = this.length,
-        results = [];
-    for (var i = 0 ; i < len; i++)
-        if (fn.call(thisObject, this[i], i, this))
-            results.push(this[i]);
-    return results;
-}
-
-Array.prototype.forEach = function(fn, thisObject) {
-    var len = this.length;
-    for (var i = 0 ; i < len; i++)
-        if (typeof this[i] != 'undefined')
-            fn.call(thisObject, this[i], i, this);
-}
-
-Array.prototype.map = function(fn, thisObject) {
-    var len = this.length,
-        result = new Array(len);
-    for (var i = 0; i < len; i++)
-        if (typeof this[i] != 'undefined')
-            result[i] = fn.call(thisObject, this[i], i, this);
-    return result;
-}
-
-
-/*
- * Prototype synonyms
- */
-
-Array.prototype.each = Array.prototype.forEach;
 
 
 /*
