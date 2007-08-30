@@ -1,7 +1,7 @@
 <library>
   <script src="collections.js"/>
   <script src="strings.js"/>
-  <script src="functional.js"/>
+  <script src="function-utils.js"/>
   <script src="osutils.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>

@@ -11,6 +11,12 @@ Function.prototype.bind = function(thisObject) {
     }
 }
 
+Function.prototype.delay = function(ms) {
+    setTimeout(this, arguments.length ? ms : 10);
+}
+
+Function.prototype.defer = Function.prototype.delay;
+
 function forEach(fn, ar, thisObject) {
     return ar.forEach(fn, thisObject);
 }

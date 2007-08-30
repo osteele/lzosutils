@@ -29,12 +29,6 @@ function clearTimeout(obj) {
     obj.run = function(){};
 }
 
-Function.prototype.delay = function(ms) {
-    setTimeout(this, arguments.length ? ms : 10);
-}
-
-Function.prototype.defer = Function.prototype.delay;
-
 var Event = {
     observe: function(target, eventName, fn) {
         new LzDelegate({run:fn}, 'run', target, eventName);
