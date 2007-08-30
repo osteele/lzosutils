@@ -4,10 +4,19 @@ Function.I = function(x) {return x};
 Function.K = function(x) {return function(){return x}};
 
 Function.prototype.bind = function(thisObject) {
-    var fn = this;
-    var args = [].slice.apply(arguments, 0).slice(1);
+    var fn = this,
+        args = [].slice.call(arguments, 1);
     return function() {
-        return fn.apply(thisObject, args.concat([].slice(arguments, 1)));
+        return fn.apply(thisObject, args.concat([].slice.apply(arguments, 1)));
+    }
+}
+
+Function.prototype.compose = function(other) {
+    var fn = this,
+        args = [].slice.call(arguments, 1);
+    return function() {
+        var v = other.apply(this, arguments);
+        return fn.call(this, v);
     }
 }
 
