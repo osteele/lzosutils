@@ -26,28 +26,14 @@ Function.prototype.delay = function(ms) {
 
 Function.prototype.defer = Function.prototype.delay;
 
-function forEach(fn, ar, thisObject) {
-    return ar.forEach(fn, thisObject);
-}
-
-function map(fn, ar, thisObject) {
-    return ar.map(fn, thisObject);
-}
-
-function filter(fn, ar, thisObject) {
-    return ar.filter(fn, thisObject);
-}
-
-var select = filter;
-
-// Returns a projection this -> this[name]
+// Returns a projection \x -> x[name]
 function pluck(name) {
-    return function() {
-        return this[name];
+    return function(object) {
+        return object[name];
     }
 }
 
-// Returns a projection this -> this[name](args...)
+// Returns a projection \x -> \x[name](args...)
 function invoke(name, args) {
     args = [].slice.call(args, 0);
     return function(object) {

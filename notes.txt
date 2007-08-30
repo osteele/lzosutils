@@ -1,0 +1,10 @@
+
+// function f1(a,b) {return [a,b]}
+// var f2 = f1.bind(null,1);
+// info(f2(2));
+
+function f3(a) {return a+1}
+function f4(a) {return a*2};
+info(f3.compose(f4)(1));
+info(f4.compose(f3)(1));
+

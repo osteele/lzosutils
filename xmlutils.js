@@ -19,13 +19,14 @@ function XMLTraverse(xml, path) {
 }
 
 function xml2js(node) {
+    if (node instanceof Array)
+        return node.map(xml2js);
     if (node.nodeType == 3)
         return node.nodeValue;
     if (node.nodeType != 1)
         return undefined;
-    var childElements = filter(
-        function(c){return c.nodeType==1},
-        node.childNodes);
+    var childElements = node.childNodes.select(
+        function(c){return c.nodeType==1});
     if (childElements.length) {
         var obj = {};
         childElements.forEach(function(child) {
@@ -42,6 +43,6 @@ function xml2js(node) {
         });
         return obj;
     } else
-        return map(function(c) {return c.nodeType==3 ? c.nodeValue : ""},
-                   node.childNodes).join('');
+        return node.childNodes.map(
+            function(c) {return c.nodeType==3 ? c.nodeValue : ""}).join('');
 }
