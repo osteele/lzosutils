@@ -21,50 +21,23 @@ Size.prototype.maxSizeTo = function(maxWidth, maxHeight) {
  * Relative Position
  */
 
-// view must be within canvas
-function oldFindBestRelativePosition(view, reference, container, margin) {
-    var refBounds = reference.getAbsoluteBounds(container),
-        refLeft = refBounds.x,
-        refTop = refBounds.y,
-        refRight = refBounds.x + refBounds.width,
-        refBottom = refBounds.y + refBounds.height;
-    var containerBounds = container.getAbsoluteBounds(),
-        containerLeft = containerBounds.x,
-        containerTop = containerBounds.y,
-        containerRight = containerBounds.x + containerBounds.width,
-        containerBottom = containerBounds.y + containerBounds.height;
-    var x0 = refLeft - view.width - margin,
-        x1 = refRight + margin;
-    // prefer the right, unless there's no room on the right and
-    // there is room on the left
-    var x = x1 + view.width > containerRight - margin && x0 >= containerLeft + margin
-        ? x0
-        : x1;
-    var y = refTop;
-    // if the reference is clipped on the top, align it with the reference's bottom
-    // if there's room
-    if (y > reference.getAttributeRelative('y', container) && refBottom - view.height >= containerTop + margin)
-        y = refBottom - view.height;
-    // if there's not room to the left or right but there is above or below,
-    // place it there
-    if (x + view.width > containerRight - margin
-       || y < containerTop || y + view.height > containerBottom) {
-        var y0 = refTop - view.height - margin,
-            y1 = refBottom + margin,
-            y_ = y0 >= containerTop + margin ? y0
-            : y1 + view.height + margin < containerBottom ? y1
-            : y;
-        if (y != y_) {
-            y = y_;
-            x = refLeft - containerLeft > containerRight - refRight
-                ? refRight - view.width
-                : refLeft;
-        }
-    }
-    return {x:x, y:y};
+LzView.prototype.moveNextTo = function(referenceView, options) {
+    var position = findBestRelativePosition(this, referenceView, options),
+        duration = options.duration;
+    (duration
+     ? this.to({x:position.x, y:position.y}, duration)
+     : this.set({x:position.x, y:position.y}));
 }
 
-function findBestRelativePosition(view, reference, container, margin) {
+// view must be within canvas
+function findBestRelativePosition(view, reference, options) {
+    var defaults = {
+        container: canvas,
+        margin: 10
+    };
+    var options = Hash.merge(defaults, options || {}),
+        container = options.container,
+        margin = options.margin;
     var refBounds = reference.getAbsoluteBounds(container),
         refLeft = refBounds.x,
         refTop = refBounds.y,

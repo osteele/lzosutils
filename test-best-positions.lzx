@@ -34,11 +34,13 @@
     ref.set({y: 313.95, x: 357, height: 528, width: 208.421052631579});
     //ref.makeDraggable();
     function f() {
+      neighbor.moveNextTo(ref, {container:refContainer});
+      return;
       var pos = findBestRelativePosition(neighbor, ref, refContainer, 10);
       neighbor.set({x: pos.x, y: pos.y});
       //if (arguments.length) info(pos);
     }
-    f();
+    f.defer();
     function reset() {
       global.findBestRelativePosition = global.oldFindBestRelativePosition;
     }

@@ -141,8 +141,10 @@ Array.fromList = function(ar) {
 
 
 /*
- * Hash utilities
+ * Prototype Hash utilities
  */
+
+var Hash = {};
 
 function $H(data) {
     return {
@@ -150,11 +152,11 @@ function $H(data) {
         keys: function() {return Hash.keys(data)},
         merge: function(other) {return Hash.merge(data, other)},
         toQueryString: function() {return Hash.toQueryString(data)},
-        values: function() {return Hash.values(data)}
+        values: function() {return Hash.values(data)},
+        // non-prototype
+        compact: function() {return Hash.compact(data)}
     };
 }
-
-var Hash = {};
 
 Hash.each = function(hash, fn) {
     for (var key in hash)
@@ -192,6 +194,21 @@ Hash.values = function(hash) {
         values.push(value);
     });
     return values;
+}
+
+
+/*
+ * Other Hash extensions
+ */
+
+Hash.compact = function(hash) {
+    var result = {};
+    for (var name in hash) {
+        var value = hash[name];
+        if (value != null && value != undefined)
+            result[name] = value;
+    }
+    return result;
 }
 
 

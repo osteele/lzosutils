@@ -34,10 +34,12 @@ Dragger.handleMouseMove = function(view, x, y) {
         var width = w = Math.max(40, state.startSize.width + canvas.getMouse('x') - state.start.x);
         var height = h = Math.max(40, state.startSize.height + canvas.getMouse('y') - state.start.y);
         var ratio = width / height;
-        if (ratio < state.ratio)
-            width = height * state.ratio;
-        else
-            height = width / state.ratio;
+        if (false) {
+            if (ratio < state.ratio)
+                width = height * state.ratio;
+            else
+                height = width / state.ratio;
+        }
         //info(w, h, ratio, width, height, width/height, state.ratio)
         view.setWidth(width);
         view.setHeight(height);
