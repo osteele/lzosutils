@@ -154,20 +154,21 @@ function $H(data) {
         toQueryString: function() {return Hash.toQueryString(data)},
         values: function() {return Hash.values(data)},
         // non-prototype
-        compact: function() {return Hash.compact(data)}
+        compact: function() {return Hash.compact(data)},
+        items: function() {return Hash.items(data)}
     };
 }
 
 Hash.each = function(hash, fn) {
+    var ix = 0;
     for (var key in hash)
-        fn(key, hash[key]);
+        fn({key:key, value:hash[key]}, ix++);
 }
 
 Hash.keys = function(hash) {
     var keys = [];
-    Hash.each(hash, function(key) {
+    for (var key in hash)
         keys.push(key);
-    });
     return keys;
 }
 
@@ -190,9 +191,8 @@ Hash.toQueryString = function(hash) {
 
 Hash.values = function(hash) {
     var values = [];
-    Hash.each(hash, function(_, value) {
-        values.push(value);
-    });
+    for (var key in source)
+        values.push(hash[key]);
     return values;
 }
 
@@ -208,6 +208,13 @@ Hash.compact = function(hash) {
         if (value != null && value != undefined)
             result[name] = value;
     }
+    return result;
+}
+
+Hash.items = function(hash) {
+    var result = [];
+    for (var key in hash)
+        result.push({key:key, value:hash[key]});
     return result;
 }
 
