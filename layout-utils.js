@@ -23,13 +23,16 @@ Size.prototype.maxSizeTo = function(maxWidth, maxHeight) {
 
 LzView.prototype.moveNextTo = function(referenceView, options) {
     var position = findBestRelativePosition(this, referenceView, options),
-        duration = options.duration;
+        duration = (options||{}).duration;
     (duration
      ? this.to({x:position.x, y:position.y}, duration)
      : this.set({x:position.x, y:position.y}));
 }
 
+
 // view must be within canvas
+
+
 function findBestRelativePosition(view, reference, options) {
     var defaults = {
         container: canvas,
@@ -49,47 +52,58 @@ function findBestRelativePosition(view, reference, options) {
         containerRight = containerBounds.x + containerBounds.width,
         containerBottom = containerBounds.y + containerBounds.height;
 
-    // width, reference min/max, container min/max
-    // -> [[x, type, penalty]]
+    // Consider aligning the left side with the left side of the
+    // container ('c'ontainer), the left side of the reference
+    // ('a'ligned), and the right side of the reference
+    // ('n'eighboring); similarly for left and right reversed.  We
+    // prefer right to left, and below to above.
+    //
+    // :: width, reference min/max, container min/max
+    // ::   -> [[x, type, penalty]]
+    // each entry is [position, type, weight]
+    // type is c=container | p=proximal | a=aligned
     function positions(w, r0, r1, c0, c1, m) {
-        //info.apply(null,arguments);
-        // each entry is [position, type, weight]
-        // type is c=container | p=proximal | a=aligned
-        var cs = [
-            [c0+m, 'c', 0], [c1-m-w, 'c', 0],
-            [r0-m-w, 'p', -20], [r1+m, 'p', -10],
-            [r0, 'a', -5], [r1-w, 'a', -5]];
-        cs.each(function(item) {
-            var x = item[0], p = 0, w=5;
-            if (x < c0+m) p += w;
-            if (x < c0) p += w;
-            if (x+w > c1-m) p += w;
-            if (x+w < c1) p += w;
-            item[2] += p;
-        });
-        return cs;
+        var m = margin;
+        var items = [
+            // aligned to the container
+            [c0+m, 'c', 1],   [c1-m-w, 'c', 0],
+            // neighboring the reference
+            [r0-m-w, 'n', 1], [r1+m, 'n', 0],
+            // aligned to the (left, right) side of the reference
+            [r0, 'a', 0],     [r1-w, 'a', 1],
+            // centered in the reference
+            [r0 + (r1 - r0 - w)/2, null, 0]
+        ];
+        // Penalize for each pixel outside the container.
+        for (var i = 0, item; item = items[i++]; ) {
+            var x = item[0], p = 0;
+            if (x < c0)   p += c0-x;
+            if (c1 < x+w) p += x+w-c1;
+            item[2] += p*1000000; // 1,000,000
+        }
+        return items;
     }
 
-    var xs = positions(view.width, refLeft, refRight, containerLeft, containerRight, margin);
-    var ys = positions(view.height, refTop, refBottom, containerTop, containerBottom, margin);
-    var candidates = [];
-    xs.forEach(function(xe) {
-        ys.forEach(function(ye) {
-            var x = xe[0], y = ye[0];
-            var p = xe[2] + ye[2];
+    var xs = positions(view.width, refLeft, refRight, containerLeft, containerRight);
+    var ys = positions(view.height, refTop, refBottom, containerTop, containerBottom);
+    var best = null;
+    xs.forEach(function(xr) {
+        ys.forEach(function(yr) {
+            var x = xr[0], y = yr[0];
+            var p = xr[2] + yr[2];
             // penalize candidates that overlap the reference
             if (x < refRight && x+view.width > refLeft && y < refBottom && y+view.height > refTop)
-                p += 100;
+                p += 100000; // 100,000
+            // penalize by the size of the union of the rectangles
+            var x0 = Math.min(x, refLeft), x1 = Math.max(x+view.width, refRight),
+                y0 = Math.min(y, refTop), y1 = Math.max(y+view.height, refBottom);
+            p += (x1-x0) + (y1-y0);
             // penalize catty-corners
-            if (xe[1] == 'p' && ye[1] == 'p')
-                p += 500;
-            // if it's off the canvas, penalize it a lot
-            if (x < 0 || y < 0 || x+view.width > canvas.width || y+view.height > canvas.height)
-                p += 1000;
-            var b = {x: x, y: y, p: p};
-            candidates.push(b);
+            // if (xr[1] == 'n' && yrs[1] == 'n')
+            //   p += 500;
+            if (p < (best.p || p+1))
+                best = {x: x, y: y, p: p};
         });
     });
-    var best = candidates.sort(function(a,b){return a.p-b.p})[0];
     return {x:best.x, y:best.y};
 }
