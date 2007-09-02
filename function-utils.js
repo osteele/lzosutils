@@ -26,10 +26,9 @@ Function.prototype.delay = function(ms) {
 
 Function.prototype.defer = Function.prototype.delay;
 
-// Returns a projection \x -> x[name]
-function pluck(name) {
+function isInstanceOf(klass) {
     return function(object) {
-        return object[name];
+        return object instanceof klass;
     }
 }
 
@@ -38,5 +37,12 @@ function invoke(name, args) {
     args = [].slice.call(args, 0);
     return function(object) {
         return object[name].apply(object, args.concat([].slice.call(arguments, 0)));
+    }
+}
+
+// Returns a projection \x -> x[name]
+function pluck(name) {
+    return function(object) {
+        return object[name];
     }
 }
