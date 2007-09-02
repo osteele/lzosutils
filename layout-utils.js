@@ -40,7 +40,8 @@ function findBestRelativePosition(view, reference, options) {
     };
     var options = Hash.merge(defaults, options || {}),
         container = options.container,
-        margin = options.margin;
+        margin = options.margin,
+        avoid = options.avoid;
     var refBounds = reference.getAbsoluteBounds(container),
         refLeft = refBounds.x,
         refTop = refBounds.y,
@@ -98,6 +99,14 @@ function findBestRelativePosition(view, reference, options) {
             var x0 = Math.min(x, refLeft), x1 = Math.max(x+view.width, refRight),
                 y0 = Math.min(y, refTop), y1 = Math.max(y+view.height, refBottom);
             p += (x1-x0) + (y1-y0);
+            // penalize intersections with siblings
+            if (avoid) {
+                avoid.each(function(b) {
+                    if (b.x <= x+view.width && x <= b.right &&
+                        b.y <= y+view.height && y <= b.bottom)
+                        p += 200;
+                });
+            }
             // penalize catty-corners
             // if (xr[1] == 'n' && yrs[1] == 'n')
             //   p += 500;
@@ -105,5 +114,6 @@ function findBestRelativePosition(view, reference, options) {
                 best = {x: x, y: y, p: p};
         });
     });
+    //var x = best.x, y = best.y;
     return {x:best.x, y:best.y};
 }
