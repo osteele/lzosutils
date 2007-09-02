@@ -46,7 +46,7 @@ function findBestRelativePosition(view, reference, options) {
         refTop = refBounds.y,
         refRight = refBounds.x + refBounds.width,
         refBottom = refBounds.y + refBounds.height;
-    var containerBounds = container.getAbsoluteBounds(),
+    var containerBounds = options.outerBounds || container.getAbsoluteBounds(),
         containerLeft = containerBounds.x,
         containerTop = containerBounds.y,
         containerRight = containerBounds.x + containerBounds.width,

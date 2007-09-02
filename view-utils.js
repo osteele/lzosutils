@@ -127,8 +127,9 @@ LzView.prototype.eachPath = function(klass, fn, thisObject) {
 }
 
 LzView.prototype.eachSibling = function(fn, klass, thisObject) {
+    var self = this;
     this.parent.subviews.forEach(function(e) {
-        if (e != this && e instanceof klass)
+        if (e != self && e instanceof klass)
             fn.call(thisObject, e);
     });
 }
@@ -153,7 +154,8 @@ LzView.prototype.getAbsoluteBounds = function(container) {
         right = Math.min(right, cb.x + cb.width);
         bottom = Math.min(bottom, cb.y + cb.height);
     }
-    return {x:left, y:top, width:right-left, height:bottom-top};
+    return {x:left, y:top, width:right-left, height:bottom-top,
+            right:right, bottom:bottom};
 }
 
 function createScrim(referenceView, options) {
