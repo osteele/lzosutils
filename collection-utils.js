@@ -191,7 +191,7 @@ Hash.toQueryString = function(hash) {
 
 Hash.values = function(hash) {
     var values = [];
-    for (var key in source)
+    for (var key in hash)
         values.push(hash[key]);
     return values;
 }
