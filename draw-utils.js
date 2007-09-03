@@ -53,3 +53,9 @@ LzDrawView.prototype.drawRect = function(x, y, w, h, rx0, ry0, rx1, ry1) {
     this.lineTo(x, y+ry0);
     this.quadraticCurveTo(x, y, x+rx0, y);
 }
+
+LzDrawView.prototype.setGradient = function(x0, y0, x1, y1, colors) {
+    var g = this.fillStyle = this.createLinearGradient(x0,y0,x1,y1);
+    for (var i = 0; i < colors.length; i++)
+        g.addColorStop(i / (colors.length-1), colors[i]);
+}
