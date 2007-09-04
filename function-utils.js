@@ -27,6 +27,8 @@ Function.prototype.delay = function(ms) {
 Function.prototype.defer = Function.prototype.delay;
 
 Function.prototype.throttle = function(fn, ms) {
+    if (ms == undefined)
+        return fn;
     var lastTime = null;
     return function() {
         var self = this,

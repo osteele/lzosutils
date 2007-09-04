@@ -54,8 +54,19 @@ LzDrawView.prototype.drawRect = function(x, y, w, h, rx0, ry0, rx1, ry1) {
     this.quadraticCurveTo(x, y, x+rx0, y);
 }
 
-LzDrawView.prototype.setGradient = function(x0, y0, x1, y1, colors) {
-    var g = this.fillStyle = this.createLinearGradient(x0,y0,x1,y1);
-    for (var i = 0; i < colors.length; i++)
-        g.addColorStop(i / (colors.length-1), colors[i]);
+LzDrawView.prototype.setGradient = function(x0, y0, x1, y1, stops) {
+    var g = this.fillStyle = this.createLinearGradient(x0,y0,x1,y1),
+        color;
+    for (var i = 0; i < stops.length; i++) {
+        var stop = stops[i],
+            offset = i / (stops.length-1);
+        if (typeof stop == 'number')
+            color = stop;
+        else {
+            stop = Hash.merge({offset:offset, color:color}, stop);
+            offset = stop.offset;
+            color = stop.color;
+        }
+        g.addColorStop(offset, color);
+    }
 }

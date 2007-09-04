@@ -126,6 +126,11 @@ Array.prototype.commas = function() {
     return this.join(',');
 }
 
+Array.prototype.last = function() {
+    var length = this.length;
+    return length ? this[length-1] : null;
+}
+
 
 /*
  * Monadic Arrays
