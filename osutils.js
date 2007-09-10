@@ -65,30 +65,52 @@ Image.removeBackground = function(bitmap) {
         x = Math.min(w, x);
         for (var y = 0; y < h+l; y += l) {
             y = Math.min(h, y);
-            if (bitmap.getPixel(x, y) == 0xffffff)
+            if (bitmap.getPixel(x, y) == 0xffffff) {
                 bitmap.floodFill(x, y, 0);
+            }
         }
     }
 }
 
-LzView.prototype.removeBitmapBackground = function() {
-    var mc = this.getMCRef();
-    var bitmap = this.bitmap = new flash.display.BitmapData(mc._width, mc._height, true, 0x80FFFFFF);
+LzView.prototype.removeBitmapBackground = function(trim, sib) {
+    //var info = trim ? global.info : function(){};
+    trim = false;
+    var mc = this.getMCRef() || this.makeContainerResource();
+    var bitmap = this.bitmap =
+        new flash.display.BitmapData(mc._width, mc._height, true, 0);//0xFFFFFFFF);
     bitmap.draw(mc);
     Image.removeBackground(bitmap);
+    if (trim) {
+        var bounds = bitmap.getColorBoundsRect(0xFF000000, 0x00000000, true);
+        info(bounds);
+        if (bounds.x || bounds.y ||
+            bounds.right < bitmap.width ||
+            bounds.top < bitmap.height) {
+            bitmap = this.bitmap = new flash.display.BitmapData(
+                bounds.width,
+                bounds.height,
+                true, 0);//0x80FFFFFF);
+            info('<-');
+            //var matrix = new flash.geom.Matrix;
+            //matrix.translate(-bounds.x,0);
+            //bitmap.draw(mc, matrix);
+            bitmap.draw(mc);
+            Image.removeBackground(bitmap);
+        }
+    }
+    if (sib) {
+        this.set('opacity', .2);
+        mc = sib.getMCRef() || sib.makeContainerResource();
+        sib.set({width: bitmap.width, height: bitmap.height, bgcolor: 0xff0000});
+        info(bitmap.width, bitmap.height);
+    }
     mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
 }
 
 function animateRect(sourceView, targetView) {
     return;
-    function getGlobalBounds(view) {
-        function get(aname) {
-            return view.getAttributeRelative(aname, canvas);
-        }
-        return {x: get('x'), y: get('y'), width: get('width'), height: get('height')};
-    }
-    var sourceRect = getGlobalBounds(sourceView);
-    var targetRect = getGlobalBounds(targetView);
+    var sourceRect = sourceView.getGlobalBounds();
+    var targetRect = targetView.getGlobalBounds();
     var view = new ZoomRect(canvas, sourceRect);
     targetRect.vanish = 1;
     view.animators(targetRect, 500);
@@ -157,33 +179,24 @@ LzBrowser.makeHTMLCallback = function(fname, arg) {
  * AJAX
  */
 
-
 // AJAX w/ JSON
-function ajax(url, onsuccess, onerror) {
+function ajax(url, onsuccess, onfailure) {
     if (url.indexOf('http') != 0) url = gHostPrefix + url;
-    var responseHolder = [];
     Debug.write('XHR', url);
-    var req = new XMLHttpRequest();
-    req.onreadystatechange = handleReadyStateChange;
-    req.open("GET", url, true);
-    req.send(null);
-    if (typeof onsuccess == 'undefined') onsuccess = null;
-    if (typeof onerror == 'undefined') onerror = null;
-    function handleReadyStateChange(request) {
-        if (request.readyState == 4) {
-            if (request.status == 200) {
-                var result = ajax.lastResult = JSON.parse(request.responseText);
-                responseHolder.push(result);
-                if (typeof result == 'string') {
-                    error(result);
-                    return;
-                }
-                onsuccess && onsuccess(result);
-            } else {
-                onerror ? onerror(result) : Debug.error(request);
-            }
-        }
+    var loader = new LoadVars();
+    loader.onLoad = function(success) {
+        if (!success)
+            onfailure ? onfailure() : Debug.error(url);
     }
+    loader.onData = function(data) {
+        data = data && data.strip();
+        var json = data && JSON.parse(data);
+        ajax.lastResult = {url:url, json:json, data:data};
+        if ((data && !json) || data == undefined)
+            return onfailure ? onfailure() : Debug.error(url);
+        onsuccess && onsuccess(json);
+    };
+    loader.load(url);
 }
 
 // JQuery compatability
@@ -195,18 +208,19 @@ $.get = function(url, params, options) {
 
 // actually does GET
 $.post = function(url, params, options) {
-    if (url.indexOf('http') < 0) url = gHostPrefix + url;
+    if (typeof options == 'function') {
+        options = {onsuccess: options};
+        if (arguments.length >= 4)
+            options.onerror = arguments[3];
+    }
+    if (url.indexOf('http') != 0)
+        url = gHostPrefix + url;
     var query = Hash.toQueryString(params);
     if (query.length) {
         if (url.indexOf('?') < 0) url += '?';
         url += query;
     }
-    var onsuccess = options = options || {};
-    if (typeof options == 'function')
-        options = {};
-    else
-        onsuccess = options['onsuccess'];
-    ajax(url, onsuccess, options['onerror']);
+    ajax(url, options['onsuccess'], options['onerror']);
 }
 
 
