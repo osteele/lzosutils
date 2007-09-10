@@ -1,0 +1,41 @@
+<canvas title="Remove background" bgcolor="#ccf">
+  <include href="debugging.lzx"/>
+  <include href="osutils.lzx"/>
+
+  <constantlayout axis="y" value="100"/>
+  <simplelayout axis="x" spacing="20" inset="10"/>
+
+<!--   <view name="im1" -->
+<!--         stretches="both" -->
+<!--         resource="http:image.jpg"> -->
+<!--   </view> -->
+
+  <view name="im2">
+    <view name="basis"
+          stretches="both"
+          resource="http:image.jpg">
+      <method event="onload">
+        removeBitmapBackground(false, parent.sib);
+      </method>
+    </view>
+    <view name="sib" clickable="true"
+          >
+    </view>
+  </view>
+
+<!--   <view name="im3"> -->
+<!--     <view name="basis" -->
+<!--           resource="http:image.jpg"> -->
+<!--       <method event="onload"> -->
+<!--         removeBitmapBackground(true, parent.sib); -->
+<!--         //parent.sib.set({height:200}); -->
+<!--       </method> -->
+<!--     </view> -->
+<!--     <view name="sib" clickable="true"> -->
+<!--     </view> -->
+<!--   </view> -->
+
+  <script>
+  </script>
+
+</canvas>
