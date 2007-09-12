@@ -183,6 +183,10 @@ LzBrowser.makeHTMLCallback = function(fname, arg) {
 function ajax(url, onsuccess, onfailure) {
     if (url.indexOf('http') != 0) url = gHostPrefix + url;
     Debug.write('XHR', url);
+    url = [url,
+           url.indexOf('?') >= 0 ? '&' : '?',
+           '_ts=',
+           (new Date).getTime()].join('');
     var loader = new LoadVars();
     loader.onLoad = function(success) {
         if (!success)
