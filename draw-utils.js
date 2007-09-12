@@ -56,6 +56,8 @@ LzDrawView.prototype.drawRect = function(x, y, w, h, rx0, ry0, rx1, ry1) {
 
 LzDrawView.prototype.setGradient = function(x0, y0, x1, y1, stops) {
     var g = this.fillStyle = this.createLinearGradient(x0,y0,x1,y1),
+        savedOpacity = this.globalAlpha,
+        opacity = savedOpacity,
         color;
     for (var i = 0; i < stops.length; i++) {
         var stop = stops[i],
@@ -63,10 +65,14 @@ LzDrawView.prototype.setGradient = function(x0, y0, x1, y1, stops) {
         if (typeof stop == 'number')
             color = stop;
         else {
-            stop = Hash.merge({offset:offset, color:color}, stop);
-            offset = stop.offset;
+            stop = Hash.merge({offset:offset, color:color, opacity:opacity},
+                              stop);
             color = stop.color;
+            offset = stop.offset;
+            opacity = stop.opacity;
         }
+        this.globalAlpha = opacity;
         g.addColorStop(offset, color);
     }
+    this.globalAlpha = savedOpacity;
 }
