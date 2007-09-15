@@ -97,6 +97,11 @@ LzView.prototype.setFilter = function(filter) {
     this.getMCRef().filters = filters;
 }
 
+LzNode.prototype.getClip = function() {
+    this.__LZmovieClipRef || this.makeContainerResource();
+    return this.__LZmovieClipRef;
+}
+
 LzNode.prototype.show = function() {
     this.setVisible(true);
 }

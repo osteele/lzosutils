@@ -2,11 +2,13 @@
   <script src="collection-utils.js"/>
   <script src="string-utils.js"/>
   <script src="function-utils.js"/>
+  <script src="processes.js"/>
   <script src="layout-utils.js"/>
   <script src="osutils.js"/>
   <script src="http.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>
+  <script src="image-utils.js"/>
   <script src="draggable.js"/>
   <script src="static-layouts.js"/>
   <include href="filter-effects.lzx"/>

@@ -6,14 +6,14 @@
  */
 
 function setTimeout(fn, ms) {
-    var obj = {run:fn};
-    LzTimer.addTimer(new LzDelegate(obj, 'run'), ms);
-    return obj;
+    var timer = setInterval(function() {
+        clearInterval(timer);
+        fn();
+    }, ms||10);
+    return timer;
 }
 
-function clearTimeout(obj) {
-    obj.run = function(){};
-}
+var clearTimeout = clearInterval;
 
 var Event = {
     observe: function(target, eventName, fn) {
@@ -36,62 +36,6 @@ Math.pinToRange = function(x, a, b) {
     return Math.max(a, Math.min(b, x));
 }
 
-
-/*
- * Image processing
- */
-
-var Image = {};
-
-Image.removeBackground = function(bitmap) {
-    var l = 30;
-    var w = bitmap.width - 1;
-    var h = bitmap.height - 1;
-    for (var x = 0; x < w+l; x += l) {
-        x = Math.min(w, x);
-        for (var y = 0; y < h+l; y += l) {
-            y = Math.min(h, y);
-            if (bitmap.getPixel(x, y) == 0xffffff) {
-                bitmap.floodFill(x, y, 0);
-            }
-        }
-    }
-}
-
-LzView.prototype.removeBitmapBackground = function(trim, sib) {
-    //var info = trim ? global.info : function(){};
-    trim = false;
-    var mc = this.getMCRef() || this.makeContainerResource();
-    var bitmap = this.bitmap =
-        new flash.display.BitmapData(mc._width, mc._height, true, 0);//0xFFFFFFFF);
-    bitmap.draw(mc);
-    Image.removeBackground(bitmap);
-    if (trim) {
-        var bounds = bitmap.getColorBoundsRect(0xFF000000, 0x00000000, true);
-        info(bounds);
-        if (bounds.x || bounds.y ||
-            bounds.right < bitmap.width ||
-            bounds.top < bitmap.height) {
-            bitmap = this.bitmap = new flash.display.BitmapData(
-                bounds.width,
-                bounds.height,
-                true, 0);//0x80FFFFFF);
-            info('<-');
-            //var matrix = new flash.geom.Matrix;
-            //matrix.translate(-bounds.x,0);
-            //bitmap.draw(mc, matrix);
-            bitmap.draw(mc);
-            Image.removeBackground(bitmap);
-        }
-    }
-    if (sib) {
-        this.set('opacity', .2);
-        mc = sib.getMCRef() || sib.makeContainerResource();
-        sib.set({width: bitmap.width, height: bitmap.height, bgcolor: 0xff0000});
-        info(bitmap.width, bitmap.height);
-    }
-    mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
-}
 
 function animateRect(sourceView, targetView) {
     return;

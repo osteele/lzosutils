@@ -20,39 +20,15 @@ Function.prototype.compose = function(other) {
     }
 }
 
-Function.prototype.delay = function(ms) {
-    setTimeout(this, arguments.length ? ms : 10);
+Function.prototype.each = function(sequence, thisObject) {
+    for (var i = 0; i < sequence.length; i++)
+        this.call(thisObject, sequence[i]);
 }
 
-Function.prototype.defer = Function.prototype.delay;
-
-Function.prototype.throttle = function(fn, ms) {
-    if (ms == undefined)
-        return fn;
-    var lastTime = null;
-    return function() {
-        var self = this,
-            args = [].slice.call(arguments, 0);
-        run();
-        function run() {
-            var wait = ms - (new Date() - lastTime);
-            // false for wait==NaN
-            if (wait > 0)
-                return run.defer(wait);
-            lastTime = new Date();
-            fn.apply(self, args);
-        }
-    }
-}
-
-Function.defer = function(fn, ms) {
-    fn.delay(ms);
-}
-
-Function.delay = Function.defer;
-
-Function.throttled = function(fn, ms) {
-    fn.throttled(ms);
+Function.prototype.map = function(sequence, thisObject) {
+    var results = new Array(sequence.length);
+    for (var i = 0; i < sequence.length; i++)
+        results[i] = this.call(thisObject, sequence[i]);
 }
 
 function isInstanceOf(klass) {
