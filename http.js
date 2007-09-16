@@ -20,7 +20,8 @@ LzLoadQueue.maxOpen = 10000;
 
 // AJAX w/ JSON
 function ajax(url, onsuccess, onfailure) {
-    if (url.indexOf('http') != 0) url = gHostPrefix + url;
+    if (url.indexOf('http') != 0)
+        url = gHostPrefix + url;
     Debug.write('XHR', url);
     url = [url,
            url.indexOf('?') >= 0 ? '&' : '?',
@@ -50,12 +51,12 @@ $.get = function(url, params, options) {
 }
 
 // actually does GET
-$.post = function(url, params, options) {
-    if (typeof options == 'function') {
+$.post = function(url, params, options, onerror) {
+    options = options || {};
+    if (typeof options == 'function')
         options = {onsuccess: options};
-        if (arguments.length >= 4)
-            options.onerror = arguments[3];
-    }
+    if (onerror)
+        options.onerror = onerror;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     var query = Hash.toQueryString(params);
@@ -63,5 +64,5 @@ $.post = function(url, params, options) {
         if (url.indexOf('?') < 0) url += '?';
         url += query;
     }
-    ajax(url, options['onsuccess'], options['onerror']);
+    ajax(url, options.onsuccess, options.onerror);
 }
