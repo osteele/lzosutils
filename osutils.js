@@ -1,6 +1,6 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
-var options = {};
+var Options = {};
 
 // LzBrowser.getLoadURL().split('?').last().split('&').each(function(item) {
 //     var split = item.split('=', 2),
@@ -12,12 +12,14 @@ var options = {};
 // });
 
 function InitializeOptions() {
+    var options = Options;
     for (var name in _root) {
         var value = _root[name];
         if (typeof value != 'function')
             options[name] = value != 'false' && value;
     }
 }
+
 InitializeOptions();
 
 

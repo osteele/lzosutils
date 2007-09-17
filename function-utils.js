@@ -31,6 +31,20 @@ Function.prototype.map = function(sequence, thisObject) {
         results[i] = this.call(thisObject, sequence[i]);
 }
 
+Function.timed = function(fn) {
+    return function() {
+        if (Function.timed.running)
+            return fn.apply(this, arguments);
+        Function.timed.running = true;
+        var startTime = (new Date).getTime(),
+            result = fn.apply(this, arguments),
+            duration = (new Date).getTime() - startTime;
+        Function.timed.running = false;
+        info('elapsed', duration/1000, 's');
+        return result;
+    }
+}
+
 function isInstanceOf(klass) {
     return function(object) {
         return object instanceof klass;
