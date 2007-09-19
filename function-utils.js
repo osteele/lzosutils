@@ -31,6 +31,13 @@ Function.prototype.map = function(sequence, thisObject) {
         results[i] = this.call(thisObject, sequence[i]);
 }
 
+Function.before = function(fn, wrapper) {
+    return function() {
+        wrapper.call(this);
+        return fn.apply(this, arguments);
+    }
+}
+
 Function.timed = function(fn) {
     return function() {
         if (Function.timed.running)
