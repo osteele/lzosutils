@@ -19,8 +19,9 @@ Function.delay = Function.defer = function(fn, ms) {
  * Throttling
  */
 
-Function.prototype.throttled = function(ms, backoff) {
+Function.prototype.throttled = function(ms, options) {
     ms = ms || 10;
+    options = options || {};
     var fn = this,
         lastTime = null;
     return function() {
@@ -33,44 +34,23 @@ Function.prototype.throttled = function(ms, backoff) {
             if (wait > 0)
                 return run.defer(wait);
             lastTime = new Date();
-            if (backoff)
+            if (options.backoff)
                 ms *= 2;
             fn.apply(self, args);
+            if (options.fromEnd)
+                lastTime = new Date();
         }
     }
 }
 
-Function.throttled = function(fn, ms, backoff) {
-    return fn.throttled(ms, backoff);
+Function.throttled = function(fn, ms, options) {
+    return fn.throttled(ms, options);
 }
 
 Function.maxtimes = function(count, fn) {
     return function() {
         if (--count < 0)
             return;
-        fn.apply(this, arguments);
-    }
-}
-
-
-/*
- * Queueing
- */
-
-Function.prototype.maxconcurrent = function(max) {
-    Debug.warn('untested');
-    var fn = this,
-        count = 0,
-        queue = [];
-    wrapper.next = fn.done = function() {
-        if (queue.length) {
-            var entry = queue.shift();
-            wrapper.apply(entry[0], entry[1]);
-        }
-    }
-    function wrapper() {
-        if (count > max)
-            return queue.push([this, [].slice.call(arguments, 0)]);
         fn.apply(this, arguments);
     }
 }

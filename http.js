@@ -20,6 +20,7 @@ LzLoadQueue.maxOpen = 10000;
 
 // AJAX w/ JSON
 function ajax(url, onsuccess, onfailure) {
+    onsuccess && typeof(onsuccess) != 'function' && Debug.error('nan', onsuccess);
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     Debug.write('XHR', url);

@@ -25,24 +25,35 @@ function xml2js(node) {
         return node.nodeValue;
     if (node.nodeType != 1)
         return undefined;
-    var childElements = node.childNodes.select(
-        function(c){return c.nodeType==1});
-    if (childElements.length) {
-        var obj = {};
-        childElements.forEach(function(child) {
-            var o = xml2js(child);
-            var v = obj[child.nodeName];
-            if (v) {
-                if (v instanceof Array)
-                    v.push(o);
-                else
-                    v = [v, o];
-                o = v;
-            }
-            obj[child.nodeName] = o;
-        });
+    var childNodes = node.childNodes,
+        childNodeCount = childNodes.length,
+        obj = {},
+        found = 0;
+    // inlining this loop is up to 50% faster
+    for (var i = 0; i < childNodeCount; i++) {
+        var child = childNodes[i];
+        if (child.nodeType != 1)
+            continue;
+        var o = xml2js(child);
+        var v = obj[child.nodeName];
+        if (v) {
+            if (v instanceof Array)
+                v.push(o);
+            else
+                v = [v, o];
+            o = v;
+        }
+        obj[child.nodeName] = o;
+        found = true;
+    }
+    if (found)
         return obj;
+    else if (childNodeCount == 1) {
+        // this special case is up to 50% faster
+        var c = childNodes[0];
+        return c.nodeType==3 ? c.nodeValue : '';
     } else
-        return node.childNodes.map(
+        // unrolling this doesn't help
+        return childNodes.map(
             function(c) {return c.nodeType==3 ? c.nodeValue : ""}).join('');
 }

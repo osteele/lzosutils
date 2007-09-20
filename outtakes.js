@@ -1,3 +1,25 @@
+/*
+ * Queueing
+ */
+
+Function.prototype.maxconcurrent = function(max) {
+    Debug.warn('untested');
+    var fn = this,
+        count = 0,
+        queue = [];
+    wrapper.next = fn.done = function() {
+        if (queue.length) {
+            var entry = queue.shift();
+            wrapper.apply(entry[0], entry[1]);
+        }
+    }
+    function wrapper() {
+        if (count > max)
+            return queue.push([this, [].slice.call(arguments, 0)]);
+        fn.apply(this, arguments);
+    }
+}
+
 // Gallery.galleries.MINE.pages[0].view.image.getBitmapString().length
 LzView.prototype.getBitmapString = function() {
     var mc = this.getMCRef();
