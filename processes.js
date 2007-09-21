@@ -19,23 +19,25 @@ Function.delay = Function.defer = function(fn, ms) {
  * Throttling
  */
 
-Function.prototype.throttled = function(ms, options) {
-    ms = ms || 10;
+Function.prototype.throttled = function(interval, options) {
+    interval = interval || 10;
     options = options || {};
     var fn = this,
-        lastTime = null;
+        lastTime = null,
+        backoffRatio = options.backoff == true ? 2 : options.backoff;
     return function() {
         var self = this,
             args = [].slice.call(arguments, 0);
-        run();
+        run.defer();
         function run() {
-            var wait = ms - (new Date() - lastTime);
+            var now = new Date,
+                wait = interval - (now - lastTime);
             // false for wait==NaN
             if (wait > 0)
                 return run.defer(wait);
-            lastTime = new Date();
-            if (options.backoff)
-                ms *= 2;
+            if (backoffRatio)
+                interval = Math.ceil(interval * backoffRatio);
+            lastTime = now;
             fn.apply(self, args);
             if (options.fromEnd)
                 lastTime = new Date();
@@ -43,14 +45,16 @@ Function.prototype.throttled = function(ms, options) {
     }
 }
 
-Function.throttled = function(fn, ms, options) {
-    return fn.throttled(ms, options);
+Function.throttled = function(fn, interval, options) {
+    return fn.throttled(interval, options);
 }
 
-Function.maxtimes = function(count, fn) {
+Function.maxtimes = function(count, fn, after) {
     return function() {
-        if (--count < 0)
-            return;
-        fn.apply(this, arguments);
+        if (--count < 0) {
+            fn = after;
+            after = undefined;
+        }
+        return fn && fn.apply(this, arguments);
     }
 }
