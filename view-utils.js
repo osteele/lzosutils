@@ -98,8 +98,8 @@ LzView.prototype.setFilter = function(filter) {
 }
 
 LzNode.prototype.getClip = function() {
-    this.__LZmovieClipRef || this.makeContainerResource();
-    return this.__LZmovieClipRef;
+    this.getMCRef() || this.makeContainerResource();
+    return this.getMCRef();
 }
 
 LzNode.prototype.show = function() {
