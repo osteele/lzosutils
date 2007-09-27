@@ -20,10 +20,10 @@ LzLoadQueue.maxOpen = 10000;
 
 // AJAX w/ JSON
 function ajax(url, onsuccess, onfailure) {
-    onsuccess && typeof(onsuccess) != 'function' && Debug.error('nan', onsuccess);
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     Debug.write('XHR', url);
+    // add timestamp
     url = [url,
            url.indexOf('?') >= 0 ? '&' : '?',
            '_ts=',
@@ -42,6 +42,44 @@ function ajax(url, onsuccess, onfailure) {
         onsuccess && onsuccess(json);
     };
     loader.load(url);
+}
+
+var ajaxState = {
+    callbacks: {},
+    sequenceNumber: 0
+}
+
+function proxiedAjax(url, onsuccess, onfailure) {
+    var state = ajaxState,
+        sequenceNumber = state.sequenceNumber++,
+        externalInterface = flash.external.ExternalInterface;
+    if (url.indexOf('http') != 0)
+        url = gHostPrefix + url;
+    url = [url,
+           url.indexOf('?') >= 0 ? '&' : '?',
+           '_ts=',
+           (new Date).getTime()].join('');
+    state.callbacks[sequenceNumber] = {onsuccess:onsuccess, onfailure:onfailure};
+    externalInterface.call("ajaxProxy", url, sequenceNumber);
+}
+
+function handleAjaxResponse(sequenceNumber, url, success, data) {
+    var state = ajaxState,
+        callbacks = state.callbacks,
+        record = callbacks[sequenceNumber] || {};
+    delete callbacks[sequenceNumber];
+    if (success) {
+        ajax.lastResult = data;
+        record.onsuccess && record.onsuccess(data);
+    } else {
+        record.onfailure ? record.onfailure() : Debug.error(url);
+    }
+}
+
+if (htmlProxy) {
+    ajax = proxiedAjax;
+    flash.external.ExternalInterface.addCallback("handleAjaxResponse",
+                                                 null, handleAjaxResponse);
 }
 
 // JQuery compatability
