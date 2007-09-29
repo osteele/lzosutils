@@ -5,80 +5,12 @@
   <script src="processes.js"/>
   <script src="layout-utils.js"/>
   <script src="osutils.js"/>
-  <script src="http.js"/>
+  <script src="ajax.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>
   <script src="image-utils.js"/>
   <script src="draggable.js"/>
   <script src="static-layouts.js"/>
   <include href="filter-effects.lzx"/>
-
-  <class name="BorderedBox" extends="drawview">
-    <attribute name="borderColor" value="0"
-               setter="this.borderColor=borderColor; redraw()"/>
-    <attribute name="borderWidth" value="1"/>
-    <attribute name="radius" value="0"/>
-    <attribute name="dash" value="null"/>
-    <method event="oninit">redraw()</method>
-    <method event="onwidth">redraw()</method>
-    <method event="onheight">redraw()</method>
-    <method event="onborderWidth">redraw()</method>
-    <method name="redraw">
-      clear();
-      beginPath();
-      if (dash)
-        withDash([5], function(){drawRect(0, 0, width-1, height-1, radius, radius)});
-      else
-        drawRect(0, 0, width-1, height-1, radius, radius);
-      this.lineWidth = borderWidth;
-      stroke();
-    </method>
-  </class>
-
-  <class name="RoundBox" extends="drawview">
-    <attribute name="radius" value="0"/>
-    <method event="oninit">redraw()</method>
-    <method event="onwidth">redraw()</method>
-    <method event="onheight">redraw()</method>
-    <method name="redraw">
-      clear();
-      beginPath();
-      drawRect(0, 0, width-1, height-1, radius, radius);
-      fill();
-    </method>
-  </class>
-
-  <class name="boxframe" extends="BorderedBox" width="100%" height="100%"/>
-
-  <class name="Link" extends="text"
-         onmouseover="setAttribute('label', '&lt;u&gt;'+plainLabel+'&lt;/u&gt;');
-                      setAttribute('fgcolor', 0x4040ff)"
-         onmouseout="setText(this.plainLabel); setAttribute('fgcolor', 0)">
-    <attribute name="plainLabel" value="$once{this.getText()}"/>
-  </class>
-
-  <class name="ScaledImage" stretches="both">
-    <method event="onload">recompute()</method>
-    <method event="onwidth" reference="parent">recompute()</method>
-    <method event="onheight" reference="parent">recompute()</method>
-    <method name="recompute">
-      if (!this['__LZmovieClipRef']) return;
-      if (!__LZmovieClipRef.mc['lmc']) return;
-      var mc = __LZmovieClipRef.mc.lmc;
-      var scale = Math.min(parent.width / mc._width, parent.height / mc._height);
-      setWidth(mc._width * scale);
-      setHeight(mc._height * scale);
-      setAttribute('unstretchedwidth', mc._width);
-      setAttribute('unstretchedheight', mc._height);
-      //info(parent.width, parent.height, mc._width, mc._height, width, height);
-    </method>
-  </class>
-
-  <class name="ZoomRect" extends="BorderedBox">
-    <attribute name="vanish" value="0"/>
-    <method event="onvanish">
-      if (vanish==1)
-        this.destroy()
-    </method>
-  </class>
+  <include href="components.lzx"/>
 </library>
