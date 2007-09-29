@@ -19,11 +19,13 @@ LzLoadQueue.maxOpen = 10000;
  */
 
 function ajax(options) {
-    var url = options.url;
+    var url = options.url,
+        onsuccess = options.success,
+        onerror = options.error;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     if (options.data) {
-        var query = Hash.toQueryString(params);
+        var query = Hash.toQueryString(options.data);
         if (query.length) {
             if (url.indexOf('?') < 0) url += '?';
             url += query;
@@ -38,15 +40,15 @@ function ajax(options) {
     var loader = new LoadVars();
     loader.onLoad = function(success) {
         if (!success)
-            options.error ? options.error() : Debug.error(url);
+            onerror ? onerror() : Debug.error(url);
     }
     loader.onData = function(data) {
         data = data && data.strip();
         var json = data && JSON.parse(data);
         ajax.lastResult = {url:url, json:json, data:data};
         if ((data && !json) || data == undefined)
-            return options.error ? options.error() : Debug.error(url);
-        options.success && options.success(json);
+            return onerror ? onerror() : Debug.error(url);
+        onsuccess && onsuccess(json);
     };
     loader.load(url);
 }
@@ -106,7 +108,6 @@ ajax.get = function(url, params, onsuccess, onerror) {
 }
 
 // actually does GET, when using LoadVars implementation
-ajax.post = function(url, params, options, onerror) {
-    info('post', url, params);
+ajax.post = function(url, params, onsuccess, onerror) {
     ajax({url:url, data:params, success:onsuccess, error:onerror, type:'POST'});
 }
