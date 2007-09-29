@@ -58,3 +58,65 @@ Function.maxtimes = function(count, fn, after) {
         return fn && fn.apply(this, arguments);
     }
 }
+
+
+// This is a function that returns the instance, not a constructor.
+// All readers are called before any taker.
+function MVar() {
+    var value,
+        readers = [],
+        writers = [],
+        takers = [];
+    return {
+        writer: function(writer) {
+            value
+                ? writers.push(writer)
+                : writer(put);
+            return this;
+        },
+        reader: function(reader) {
+            value
+                ? reader(value[0])
+                : readers.push(reader);
+            return this;
+        },
+        taker: function(taker) {
+            if (!value)
+                return takers.push(taker);
+            var x = value[0];
+            value = null;
+            taker(value);
+            value || runNextWriter();
+            return this;
+        },
+        put: put,
+        tryPut: function(x) {
+            value ? false : (value = [x], true);
+        },
+        tryTake: function(x) {
+            var was = value;
+            value = null;
+            return was;
+        }
+    }
+    function put(x) {
+        if (value)
+            return writers.push(Function.K(x));
+        value = [x];
+        if (readers.length) {
+            readers.each(function(fn){fn.call(null, x)});
+            readers = [];
+        }
+        if (takers.length) {
+            var taker = takers.shift();
+            taker(x);
+        }
+        value || runNextWriter();
+    }
+    function runNextWriter() {
+        if (!value && writers.length) {
+            var writer = writers.shift();
+            writer(put);
+        }
+    }
+}
