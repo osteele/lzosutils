@@ -57,7 +57,7 @@ String.prototype.pluralize = function(count) {
 
 // +pattern+ is required to be a string; there's therefore really no point in
 // accepting a Function for +sub+.
-String.prototype.replace = String.prototype['replace'] || function(pattern, sub) {
+String.prototype.replace = String.prototype.replace || function(pattern, sub) {
     var splits = this.split(pattern);
     var spans = new Array(splits.length*2-1);
     for (var i = 0, dst = 0; i < splits.length; i++) {

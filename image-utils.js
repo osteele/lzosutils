@@ -4,15 +4,7 @@
  * Image loading
  */
 
-var loadImageQueue = [];
-var loadImageQueueLoading = 0;
-
 function loadImage(url, options) {
-    var max = 100;
-    if (loadImageQueueLoading >= max) {
-        loadImageQueue.push([url, options]);
-        return;
-    }
     var mcl = new MovieClipLoader,
         ix = arguments.callee.ix = (arguments.callee.ix||0)+1,
         name = 'loadMyImage' + ix,
@@ -24,27 +16,16 @@ function loadImage(url, options) {
             onLoadError: function(mc, errorCode, httpStatus) {
                 options.onerror || error('image', url);
                 options.onerror && options.onerror(errorCode, httpStatus);
-                next();
             },
             // later than onLoadComplete
             onLoadInit: function(mc, httpStatus) {
                 options.onload && options.onload(mc, httpStatus);
-                next();
             }
         };
     mcl.addListener(listener);
-    //info('loadclip', mcl, mc, url);
     loadImageQueueLoading += 1;
     mcl.loadClip(url, mc);
     return mc;
-
-    function next() {
-        loadImageQueueLoading -= 1;
-        if (loadImageQueueLoading < max && loadImageQueue.length) {
-            var entry = loadImageQueue.shift();
-            loadImage(entry[0], entry[1]);
-        }
-    }
 }
 
 
