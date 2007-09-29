@@ -18,10 +18,17 @@ LzLoadQueue.maxOpen = 10000;
  * AJAX
  */
 
-// AJAX w/ JSON
-function ajax(url, onsuccess, onfailure) {
+function ajax(options) {
+    var url = options.url;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
+    if (options.data) {
+        var query = Hash.toQueryString(params);
+        if (query.length) {
+            if (url.indexOf('?') < 0) url += '?';
+            url += query;
+        }
+    }
     Debug.write('XHR', url);
     // add timestamp
     url = [url,
@@ -31,48 +38,60 @@ function ajax(url, onsuccess, onfailure) {
     var loader = new LoadVars();
     loader.onLoad = function(success) {
         if (!success)
-            onfailure ? onfailure() : Debug.error(url);
+            options.error ? options.error() : Debug.error(url);
     }
     loader.onData = function(data) {
         data = data && data.strip();
         var json = data && JSON.parse(data);
         ajax.lastResult = {url:url, json:json, data:data};
         if ((data && !json) || data == undefined)
-            return onfailure ? onfailure() : Debug.error(url);
-        onsuccess && onsuccess(json);
+            return options.error ? options.error() : Debug.error(url);
+        options.success && options.success(json);
     };
     loader.load(url);
 }
 
 var ajaxState = {
-    callbacks: {},
-    sequenceNumber: 0
+    sequenceNumber: 0,
+    handlers: {}
 }
 
-function proxiedAjax(url, onsuccess, onfailure) {
+function proxiedAjax(options) {
     var state = ajaxState,
         sequenceNumber = state.sequenceNumber++,
         externalInterface = flash.external.ExternalInterface;
+    var url = options.url;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     url = [url,
            url.indexOf('?') >= 0 ? '&' : '?',
            '_ts=',
            (new Date).getTime()].join('');
-    state.callbacks[sequenceNumber] = {onsuccess:onsuccess, onfailure:onfailure};
-    externalInterface.call("ajaxProxy", url, sequenceNumber);
+    state.handlers[sequenceNumber] = {url:url,
+                                      success:options.success,
+                                      failure:options.error};
+    var options = {
+        url: options.url,
+        cache: false,
+        data: options.data,
+        dataType: 'json',
+        type: options.type
+    };
+    if (!options.data) delete options.data;
+    if (!options.type) delete options.type;
+    externalInterface.call("ajaxProxy", sequenceNumber, options);
 }
 
-function handleAjaxResponse(sequenceNumber, url, success, data) {
+function handleAjaxResponse(sequenceNumber, method, data) {
     var state = ajaxState,
-        callbacks = state.callbacks,
-        record = callbacks[sequenceNumber] || {};
-    delete callbacks[sequenceNumber];
-    if (success) {
+        record = state.handlers[sequenceNumber] || {},
+        callback = record[method];
+    delete state.handlers[sequenceNumber];
+    if (method == 'success') {
         ajax.lastResult = data;
-        record.onsuccess && record.onsuccess(data);
+        callback && callback(data);
     } else {
-        record.onfailure ? record.onfailure() : Debug.error(url);
+        callback ? callback() : Debug.error(url);
     }
 }
 
@@ -82,26 +101,12 @@ if (htmlProxy) {
                                                  null, handleAjaxResponse);
 }
 
-// JQuery compatability
-function $() {}
-
-$.get = function(url, params, options) {
-    $.post(url, params, options);
+ajax.get = function(url, params, onsuccess, onerror) {
+    ajax({url:url, data:params, success:onsuccess, error:onerror});
 }
 
-// actually does GET
-$.post = function(url, params, options, onerror) {
-    options = options || {};
-    if (typeof options == 'function')
-        options = {onsuccess: options};
-    if (onerror)
-        options.onerror = onerror;
-    if (url.indexOf('http') != 0)
-        url = gHostPrefix + url;
-    var query = Hash.toQueryString(params);
-    if (query.length) {
-        if (url.indexOf('?') < 0) url += '?';
-        url += query;
-    }
-    ajax(url, options.onsuccess, options.onerror);
+// actually does GET, when using LoadVars implementation
+ajax.post = function(url, params, options, onerror) {
+    info('post', url, params);
+    ajax({url:url, data:params, success:onsuccess, error:onerror, type:'POST'});
 }
