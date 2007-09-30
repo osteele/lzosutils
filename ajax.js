@@ -104,10 +104,20 @@ if (htmlProxy) {
 }
 
 ajax.get = function(url, params, onsuccess, onerror) {
+    if (typeof params == 'function') {
+        params = {};
+        onsuccess = arguments[1];
+        onerror = arguments[2];
+    }
     ajax({url:url, data:params, success:onsuccess, error:onerror});
 }
 
-// actually does GET, when using LoadVars implementation
+// when using LoadVars implementation does GET instead
 ajax.post = function(url, params, onsuccess, onerror) {
+    if (typeof params == 'function') {
+        params = {};
+        onsuccess = arguments[1];
+        onerror = arguments[2];
+    }
     ajax({url:url, data:params, success:onsuccess, error:onerror, type:'POST'});
 }
