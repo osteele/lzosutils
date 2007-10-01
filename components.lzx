@@ -44,18 +44,24 @@
   </class>
 
   <class name="ScaledImage" stretches="both">
+    <method event="oninit">recompute();v=this</method>
     <method event="onload">recompute()</method>
     <method event="onwidth" reference="parent">recompute()</method>
     <method event="onheight" reference="parent">recompute()</method>
     <method name="recompute">
-      if (!this['__LZmovieClipRef']) return;
-      if (!__LZmovieClipRef.mc['lmc']) return;
-      var mc = __LZmovieClipRef.mc.lmc;
+      var mc = getMCRef();
+      if (!mc) return;
+    //  if (!__LZmovieClipRef) return;
+  //    if (!__LZmovieClipRef.mc) return;
+  //    if (!__LZmovieClipRef.mc.lmc) return;
+//      var mc = __LZmovieClipRef.mc.lmc;
       var scale = Math.min(parent.width / mc._width, parent.height / mc._height);
+      //info(parent.width, parent.height, mc._width, mc._height, scale);
+      //setAttribute('unstretchedwidth', mc._width);
+      //setAttribute('unstretchedheight', mc._height);
       setWidth(mc._width * scale);
       setHeight(mc._height * scale);
-      setAttribute('unstretchedwidth', mc._width);
-      setAttribute('unstretchedheight', mc._height);
+      //set({width:10,height:10,unstretchedwidth:500,unstretchedheight:500})
       //info(parent.width, parent.height, mc._width, mc._height, width, height);
     </method>
   </class>
