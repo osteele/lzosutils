@@ -3,7 +3,7 @@ Author: Oliver Steele
 Copyright: Copyright 2006 Oliver Steele.  All rights reserved.
 Homepage: http://osteele.com/sources/openlaszlo/json
 License: MIT License.
-Version: 1.0
+Version: 1.1
 
 == JSON.stringify
 function JSON.stringify(value, [options]);
@@ -39,13 +39,13 @@ Usage:
   an error string and a character offset.
 
 === Notes
-JSON.parse accepts these strings don't conform to the JSON grammar:
+JSON.parse accepts these strings which don't conform to the JSON grammar:
 * '1.e1' -- JSON requires digits after the decimal point
-* '01' -- JSON doesn't permit leading zeros.
+* '01'   -- JSON doesn't permit leading zeros.
 * '"\a"' -- JSON doesn't permit nonescape characters to be encoded
 
-The parser does not accept unquoted object property names such as {a:
-1}.  These are valid JavaScript (when the property name is a valid
+The parser does not accept unquoted object property names such as {a:1}.
+These are valid JavaScript (when the property name is a valid
 identifier), but they are not in the JSON grammar.
 */
 
@@ -85,9 +85,10 @@ JSON.generator.CHARACTER_QUOTES = {
 };
 
 JSON.generator.prototype.primitiveExceptions = {
-	'NaN': 'null',
-	'Infinity': 'null',
-	'-Infinity': 'null'
+    'undefined': 'null',
+    'NaN': 'null',
+    'Infinity': 'null',
+    '-Infinity': 'null'
 };
 
 JSON.generator.prototype.generate = function (value, options) {
@@ -101,8 +102,10 @@ JSON.generator.prototype.appendValue = function (value) {
     case 'string':
         this.appendString(value);
         break;
+    case 'null':
+        this.segments.push('null');
     case 'object':
-        this.findObjectAppender(value).apply(this, [value]);
+        this.findObjectAppender(value).call(this, value);
         break;
     default:
         this.appendPrimitive(value);
@@ -110,32 +113,35 @@ JSON.generator.prototype.appendValue = function (value) {
 };
 
 JSON.generator.prototype.appendPrimitive = function (v) {
-    var s = String(v);
-    if (this.primitiveExceptions[s])
-        s = this.primitiveExceptions[s];
+    var s = String(v),
+        exceptions = this.primitiveExceptions;
+    if (exceptions[s])
+        s = exceptions[s];
     this.segments.push(s);
 };
 
 JSON.generator.prototype.appendString = function (string) {
-    var segments = this.segments;
-    var escapes = JSON.generator.CHARACTER_QUOTES;
-    var start = 0;
-    var i = 0;
+    var segments = this.segments,
+        escapes = JSON.generator.CHARACTER_QUOTES,
+        start = 0,
+        i = 0,
+        len = string.length;
     segments.push('"');
-    while (i < string.length) {
-        var c = string.charAt(i++);
-        if (escapes[c]) {
+    while (i < len) {
+        var c = string.charAt(i++),
+            escape = escapes[c];
+        if (escape) {
             if (i-1 > start)
                 segments.push(string.slice(start, i-1));
-            segments.push(escapes[c]);
+            segments.push(escape);
             start = i;
         } else if (c < ' ' || c > '~') {
-			var n = c.charCodeAt(0);
-			segments.push('\\u');
-			for (var shift = 16; (shift -= 4) >= 0; )
-				segments.push(JSON.HEXDIGITS.charAt((n >> shift) & 15));
-			start = i;
-		} // else collect into current segment
+            var n = c.charCodeAt(0);
+            segments.push('\\u');
+            for (var shift = 16; (shift -= 4) >= 0; )
+                segments.push(JSON.HEXDIGITS.charAt((n >> shift) & 15));
+            start = i;
+        } // else collect into current segment
     }
     if (i > start)
         segments.push(string.slice(start, i));
@@ -155,13 +161,14 @@ JSON.generator.prototype.objectAppenders = [
     [Array, function (ar) {
         var segments = this.segments;
         segments.push("[");
-        for (var i = 0; i < ar.length; i++) {
+        for (var i = 0, len = ar.length; i < length; i++) {
             if (i > 0) segments.push(",");
             this.appendValue(ar[i]);
         }
         segments.push("]");
     }],
-    // This must come last, since it's a superclass
+    // This must come last, since it's a superclass of the classes
+    // above
     [Object, function (object) {
         var segments = this.segments;
         segments.push("{");
@@ -176,10 +183,10 @@ JSON.generator.prototype.objectAppenders = [
     }]];
 
 JSON.generator.prototype.findObjectAppender = function (object) {
-    if (object == null)
-        return function (object) {this.segments.push("null")};
-    for (var i = 0; i < this.objectAppenders.length; i++) {
-        var entry = this.objectAppenders[i];
+    var appenders = this.objectAppenders,
+        len = appenders.length;
+    for (var i = 0; i < len; i++) {
+        var entry = appenders[i];
         if (object instanceof entry[0])
             return entry[1];
     }
@@ -202,27 +209,27 @@ JSON.parser.CHARACTER_UNQUOTES = {
 };
 
 JSON.parser.prototype.setOptions = function (options) {
-	if (options['errorHandler'])
-		this.errorHandler = options.errorHandler;
+    if (options['errorHandler'])
+        this.errorHandler = options.errorHandler;
 };
 
 JSON.parser.prototype.parse = function (str) {
     this.string = str;
     this.index = 0;
-	this.message = null;
+    this.message = null;
     var value = this.readValue();
-	if (!this.message && this.next())
-		value = this.error("extra characters at the end of the string");
+    if (!this.message && this.next())
+        value = this.error("extra characters at the end of the string");
     if (this.message && this.errorHandler)
         this.errorHandler(this.message, this.index);
     return value;
 };
 
 JSON.parser.prototype.error = function (message) {
-	this.message = message;
-	return undefined;
+    this.message = message;
+    return undefined;
 }
-    
+
 JSON.parser.prototype.readValue = function () {
     var c = this.next();
     var fn = c && this.table[c];
@@ -238,29 +245,29 @@ JSON.parser.prototype.readValue = function () {
         }
     }
     if (c) return this.error("invalid character: '" + c + "'");
-	return this.error("empty expression");
+    return this.error("empty expression");
 }
 
 JSON.parser.prototype.table = {
     '{': function () {
         var o = {};
         var c;
-		var count = 0;
+        var count = 0;
         while ((c = this.next()) != '}') {
             if (count) {
-				if (c != ',')
-					this.error("missing ','");
-			} else if (c == ',') {
-				return this.error("extra ','");
-			} else
-				--this.index;
+                if (c != ',')
+                    this.error("missing ','");
+            } else if (c == ',') {
+                return this.error("extra ','");
+            } else
+                --this.index;
             var k = this.readValue();
             if (typeof k == "undefined") return undefined;
             if (this.next() != ':') return this.error("missing ':'");
             var v = this.readValue();
             if (typeof v == "undefined") return undefined;
             o[k] = v;
-			count++;
+            count++;
         }
         return o;
     },
@@ -270,12 +277,12 @@ JSON.parser.prototype.table = {
         while ((c = this.next()) != ']') {
             if (!c) return this.error("unmatched '['");
             if (ar.length) {
-				if (c != ',')
-					this.error("missing ','");
-			} else if (c == ',') {
-				return this.error("extra ','");
-			} else
-				--this.index;
+                if (c != ',')
+                    this.error("missing ','");
+            } else if (c == ',') {
+                return this.error("extra ','");
+            } else
+                --this.index;
             var n = this.readValue();
             if (typeof n == "undefined") return undefined;
             ar.push(n);
@@ -290,23 +297,23 @@ JSON.parser.prototype.table = {
         var c;
         while ((c = s.charAt(i++)) != '"') {
             //if (i == s.length) return this.error("unmatched '\"'");
-			if (!c) return this.error("umatched '\"'");
+            if (!c) return this.error("umatched '\"'");
             if (c == '\\') {
                 if (start < i-1)
                     segments.push(s.slice(start, i-1));
                 c = s.charAt(i++);
-				if (c == 'u') {
-					var code = 0;
-					start = i;
-					while (i < start+4) {
-						c = s.charAt(i++);
-						var n = JSON.HEXDIGITS.indexOf(c.toLowerCase());
-						if (n < 0) return this.error("invalid unicode digit: '"+c+"'");
-						code = code * 16 + n;
-					}
-					segments.push(String.fromCharCode(code));
-				} else
-					segments.push(JSON.parser.CHARACTER_UNQUOTES[c] || c);
+                if (c == 'u') {
+                    var code = 0;
+                    start = i;
+                    while (i < start+4) {
+                        c = s.charAt(i++);
+                        var n = JSON.HEXDIGITS.indexOf(c.toLowerCase());
+                        if (n < 0) return this.error("invalid unicode digit: '"+c+"'");
+                        code = code * 16 + n;
+                    }
+                    segments.push(String.fromCharCode(code));
+                } else
+                    segments.push(JSON.parser.CHARACTER_UNQUOTES[c] || c);
                 start = i;
             }
         }
@@ -315,8 +322,8 @@ JSON.parser.prototype.table = {
         this.index = i;
         return segments.length == 1 ? segments[0] : segments.join('');
     },
-	// Also any digit.  The statement that follows this table
-	// definition fills in the digits.
+    // Also any digit.  The statement that follows this table
+    // definition fills in the digits.
     '-': function () {
         var s = this.string;
         var i = this.index;
@@ -330,7 +337,7 @@ JSON.parser.prototype.table = {
         };
         do {
             var c = s.charAt(i++);
-			if (!c) break;
+            if (!c) break;
             if ('0' <= c && c <= '9') continue;
             if (permittedSigns.indexOf(c) >= 0) {
                 permittedSigns = '';
@@ -340,8 +347,8 @@ JSON.parser.prototype.table = {
             if (state == 'exp') permittedSigns = '+-';
         } while (state);
         this.index = --i;
-		s = s.slice(start, i)
-		if (s == '-') return this.error("invalid number");
+        s = s.slice(start, i)
+        if (s == '-') return this.error("invalid number");
         return Number(s);
     }
 };
