@@ -104,6 +104,7 @@ JSON.generator.prototype.appendValue = function (value) {
         break;
     case 'null':
         this.segments.push('null');
+        break;
     case 'object':
         this.findObjectAppender(value).call(this, value);
         break;
