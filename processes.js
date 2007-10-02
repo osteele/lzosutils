@@ -120,3 +120,9 @@ function MVar() {
         }
     }
 }
+
+function RemoteMVar(options) {
+    var mvar = MVar();
+    this.reader = mvar.reader;
+    ajax.get(options.url, mvar.put);
+}
