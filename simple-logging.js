@@ -22,16 +22,28 @@ function debug() {__debug_message('debug', arguments)}
 function warn() {Debug.warn.apply(Debug, arguments)}
 function error() {Debug.error.apply(Debug, arguments)}
 
-if (false) {
-    function info() {
-        var expr = ['window.console && console.info && console.info(',
-            JSON.stringify(arguments), ')'].join('');
-        LzBrowser.loadJS(expr);
-    }
-
-    function error() {
-        var expr = ['window.console && console.error && console.error(',
-            JSON.stringify(arguments), ')'].join('');
-        LzBrowser.loadJS(expr);
+Debug.toBrowserConsole = function(flag) {
+    var options = arguments.callee;
+    flag = Boolean(flag == undefined ? true : flag);
+    if (options['installed'] == flag)
+        return;
+    options.installed = flag;
+    var names = ['info', 'debug', 'warn', 'error'];
+    for (var i = 0; i < names.length; i++)
+        // fn call to create new bindings
+        install(names[i]);
+    function install(name) {
+        var basis = global[name],
+            reporter = 'console.' + name;
+        global[name] = around;
+        function around() {
+            basis.apply(this, arguments);
+            var expr = ['window.console&&', reporter, '&&', reporter, '(',
+                JSON.stringify(arguments), ')'].join('');
+            LzBrowser.loadJS(expr);
+        }
     }
 }
+
+if (false)
+    Debug.toBrowserConsole();
