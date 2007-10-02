@@ -38,9 +38,10 @@
 
   <class name="Link" extends="text"
          onmouseover="setAttribute('label', '&lt;u&gt;'+plainLabel+'&lt;/u&gt;');
-                      setAttribute('fgcolor', 0x4040ff)"
-         onmouseout="setText(this.plainLabel); setAttribute('fgcolor', 0)">
+                      setAttribute('fgcolor', 0x4040ff);"
+         onmouseout="setText(this.plainLabel); setAttribute('fgcolor', mycolor)">
     <attribute name="plainLabel" value="$once{this.getText()}"/>
+    <handler name="oninit">this.mycolor=parseInt(this.colorstring.slice(1), 16)</handler>
   </class>
 
   <class name="ScaledImage" stretches="both">
