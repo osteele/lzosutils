@@ -162,7 +162,7 @@ JSON.generator.prototype.objectAppenders = [
     [Array, function (ar) {
         var segments = this.segments;
         segments.push("[");
-        for (var i = 0, len = ar.length; i < length; i++) {
+        for (var i = 0, len = ar.length; i < len; i++) {
             if (i > 0) segments.push(",");
             this.appendValue(ar[i]);
         }
