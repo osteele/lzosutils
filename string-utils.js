@@ -55,20 +55,20 @@ String.prototype.pluralize = function(count) {
     return this+'s';
 }
 
-// +pattern+ is required to be a string; there's therefore really no point in
+// +pattern+ is required to be a string; there's therefore no point in
 // accepting a Function for +sub+.
 String.prototype.replace = String.prototype.replace || function(pattern, sub) {
-    var splits = this.split(pattern);
-    var spans = new Array(splits.length*2-1);
+    var splits = this.split(pattern),
+        segments = new Array(splits.length*2-1);
     for (var i = 0, dst = 0; i < splits.length; i++) {
-        i && (spans[dst++] = sub);
-        spans[dst++] = splits[i];
+        i && (segments[dst++] = sub);
+        segments[dst++] = splits[i];
     }
-    return spans.join('');
+    return segments.join('');
 }
 
 String.prototype.strip = function() {
-    var ws = " \t\n\r";
+    var i, j, ws = " \t\n\r";
     for (j = this.length; --j >= 0 && ws.indexOf(this.charAt(j)) >= 0; )
         ;
     for (i = 0; i < j && ws.indexOf(this.charAt(i)) >= 0; i++)
@@ -78,6 +78,6 @@ String.prototype.strip = function() {
 
 String.prototype.truncate = function(length, ellipsis) {
     return (this.length <= length
-            ? string
-            : string.slice(0, length) + ellipsis);
+            ? this
+            : this.slice(0, length) + (ellipsis||''));
 }

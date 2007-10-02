@@ -158,7 +158,6 @@ FlashBridge.prototype.call = function(fn) {
         this.callbacks[id] = callback;
     }
     var expr = ['FlashBridge.handle("', fn, '",', JSON.stringify(args), ')'].join('');
-    info(expr);
     LzBrowser.loadJS(expr);
 }
 
