@@ -126,3 +126,19 @@ function RemoteMVar(options) {
     this.reader = mvar.reader;
     ajax.get(options.url, mvar.put);
 }
+
+var Pi = {
+    Name: function(options) {
+        var mvar = MVar();
+        this.oninput = mvar.reader;
+        var throttledGetter = Function.maxtimes(5,
+            Function.throttled(
+                getter, 2000,
+                {fromEnd:true, backoff:true}),
+                                                reportError.bind(null, "couldn't connecto the server"));
+        throttledGetter();
+        function getter() {
+            ajax.get(options.url, mvar.put, throttledGetter);
+        }
+    }
+}
