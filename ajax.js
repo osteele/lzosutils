@@ -89,12 +89,15 @@ function handleAjaxResponse(sequenceNumber, method, data) {
         record = state.handlers[sequenceNumber] || {},
         callback = record[method];
     delete state.handlers[sequenceNumber];
-    if (method == 'success') {
+    switch (method) {
+    case 'success':
         ajax.lastResult = data;
-        callback && callback(data);
-    } else {
-        callback ? callback() : Debug.error(url);
+        break;
+    case 'error':
+        callback || Debug.error(record.url);
+        break;
     }
+    callback && callback(data);
 }
 
 if (htmlProxy) {
