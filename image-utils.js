@@ -23,7 +23,6 @@ function loadImage(url, options) {
             }
         };
     mcl.addListener(listener);
-    loadImageQueueLoading += 1;
     mcl.loadClip(url, mc);
     return mc;
 }
@@ -53,12 +52,13 @@ Image.removeBackground = function(bitmap) {
 LzView.prototype.removeBitmapBackground = function(trim, sib) {
     //var info = trim ? global.info : function(){};
     trim = false;
-    var mc = this.getMCRef() || this.makeContainerResource();
+    var mc = this.getClip();
     var bitmap = this.bitmap =
-        new flash.display.BitmapData(mc._width, mc._height, true, 0);//0xFFFFFFFF);
+        new flash.display.BitmapData(mc._width, mc._height, true, 0xFFFF0000);
     bitmap.draw(mc);
     Image.removeBackground(bitmap);
     if (trim) {
+        info('tirm');
         var bounds = bitmap.getColorBoundsRect(0xFF000000, 0x00000000, true);
         info(bounds);
         if (bounds.x || bounds.y ||
@@ -82,5 +82,14 @@ LzView.prototype.removeBitmapBackground = function(trim, sib) {
         sib.set({width: bitmap.width, height: bitmap.height, bgcolor: 0xff0000});
         info(bitmap.width, bitmap.height);
     }
+    mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
+}
+
+LzView.prototype.smoothBitmap = function() {
+    var mc = this.getClip(),
+        bitmap = this.bitmap =
+        new flash.display.BitmapData(mc._width, mc._height, true, 0x00000000);
+    bitmap.draw(mc);
+    info(mc._width, mc._height);
     mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
 }
