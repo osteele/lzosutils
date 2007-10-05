@@ -1,3 +1,29 @@
+loadImage.active = 0;
+loadImage.queue = [];
+loadImage.limited = function(url, options) {
+    var queueMax = 1;
+    if (loadImage.active >= queueMax)
+        return loadImage.queue.push([url, options]);
+    loadImage.active += 1;
+    var onload = options.onload,
+        onerror = options.onerror;
+    options = Hash.merge({}, options);
+    options.onerror = function() {
+        onerror && onerror.apply(this, arguments);
+        next();
+    }
+    options.onload = function() {
+        onload && onload.apply(this, arguments);
+        next();
+    }
+    loadImage(url, options);
+    function next() {
+        loadImage.active -= 1;
+        if (loadImage.active < 2)
+            loadImage.apply(null, loadImage.queue.unshift());
+    }
+}
+
 /*
  * Queueing
  */

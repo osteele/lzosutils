@@ -15,7 +15,7 @@ function InitializeOptions() {
     var options = Options;
     for (var name in _root) {
         var value = _root[name];
-        if (typeof value != 'function')
+        if (typeof value == 'string')
             options[name] = value != 'false' && value;
     }
 }
