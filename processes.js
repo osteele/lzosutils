@@ -124,7 +124,7 @@ function MVar() {
 function RemoteMVar(options) {
     var mvar = MVar();
     this.reader = mvar.reader;
-    ajax.get(options.url, mvar.put);
+    ajax(Hash.merge({success:mvar.put}, options));
 }
 
 var Pi = {
@@ -138,7 +138,7 @@ var Pi = {
                                                 reportError.bind(null, "couldn't connecto the server"));
         throttledGetter();
         function getter() {
-            ajax.get(options.url, mvar.put, throttledGetter);
+            ajax(Hash.merge({success:mvar.put, error:throttledGetter}, options));
         }
     }
 }
