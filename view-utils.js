@@ -91,7 +91,13 @@ LzView.prototype.moveTo = function(x, y) {
     this.setY(y);
 }
 
+LzView.prototype.setBlur = function(blur) {
+    this.setFilter(new flash.filters.BlurFilter(blur, blur));
+}
+
 LzView.prototype.setFilter = function(filter) {
+    var mc = this.getMCRef();
+    if (!mc) return;
     var filters = [];
     filter && filters.push(filter);
     this.getMCRef().filters = filters;
