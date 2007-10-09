@@ -1,14 +1,17 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
 var gHostPrefix = 'http://styleandshare.com';
-var gStaticHostPrefix = 'http://images.styleandshare.com';
+var gImageHostPrefix = 'http://images.styleandshare.com';
+var gStaticHostPrefix = 'http://static.styleandshare.com';
 
-if (LzBrowser.getLoadURL().indexOf(':8080') >= 0 || LzBrowser.getLoadURL().indexOf('zardoz.dev') >= 0) {
+if (Options.network == 'development' || !Options.network) {
     gHost = 'zardoz.dev';
     gHostPrefix = 'http://' + gHost;
+    gImageHostPrefix = gHostPrefix;
     gStaticHostPrefix = gHostPrefix;
-} else if (LzBrowser.getLoadURL().indexOf('staging.styleandshare.com') >= 0) {
+} else if (Options.network == 'staging') {
     gHostPrefix = 'http://staging.styleandshare.com';
+    gStaticHostPrefix = 'http://static.staging.styleandshare.com';
 }
 
 LzLoadQueue.maxOpen = 10000;
@@ -22,6 +25,7 @@ function ajax(options) {
     var url = options.url,
         onsuccess = options.success,
         onerror = options.error;
+    url||error('no url');
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     if (options.data) {
@@ -33,10 +37,9 @@ function ajax(options) {
     }
     Debug.write('XHR', url);
     // add timestamp
-    url = [url,
-           url.indexOf('?') >= 0 ? '&' : '?',
-           '_ts=',
-           (new Date).getTime()].join('');
+    if (!options.cache)
+        url = [url, url.indexOf('?') >= 0 ? '&' : '?',
+               '_ts=', (new Date).getTime()].join('');
     var loader = new LoadVars();
     loader.onLoad = function(success) {
         if (!success)
@@ -65,16 +68,15 @@ function proxiedAjax(options) {
     var url = options.url;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
-    url = [url,
-           url.indexOf('?') >= 0 ? '&' : '?',
-           '_ts=',
-           (new Date).getTime()].join('');
+    if (!options.cache)
+        url = [url, url.indexOf('?') >= 0 ? '&' : '?',
+               '_ts=', (new Date).getTime()].join('');
     state.handlers[sequenceNumber] = {url:url,
                                       success:options.success,
                                       failure:options.error};
     var options = {
         url: options.url,
-        cache: false,
+        cache: options.cache||false,
         data: options.data,
         dataType: 'json',
         type: options.type
@@ -89,11 +91,14 @@ function handleAjaxResponse(sequenceNumber, method, data) {
         record = state.handlers[sequenceNumber] || {},
         callback = record[method];
     delete state.handlers[sequenceNumber];
+    // special cases
     switch (method) {
     case 'success':
+        // collect it for debugging
         ajax.lastResult = data;
         break;
     case 'error':
+        // report an error if the caller isn't going to
         callback || Debug.error(record.url);
         break;
     }
@@ -123,4 +128,36 @@ ajax.post = function(url, params, onsuccess, onerror) {
         onerror = arguments[2];
     }
     ajax({url:url, data:params, success:onsuccess, error:onerror, type:'POST'});
+}
+
+// Additional options:
+// - fallback: replacement options if the first call fails
+// - retries: retry this many times; a number or
+//            {count::Number, before::function, throttle::ms, backoff::%}
+// The retry +before+ function should return false to suppress the retry.
+// It is called with two arguments: the number of the current retry,
+// and a function that initiates the next retry.
+// (+before+ and +throttle+ are not implemented.)
+ajax.superGet = function(options) {
+    options = Hash.merge({}, options);
+    var onerror = options.error,
+        retries = options.retries;
+    if (retries)
+        options.retries = (retries instanceof Number
+                           ? {count:retries}
+                           : Hash.merge({}, retries));
+    options.error = function() {
+        var fallback = options.fallback,
+            retries = options.retries;
+        if (fallback) {
+            delete options.fallback;
+            Hash.merge(options, fallback);
+            ajax.superGet(options);
+        } else if (retries && retries.count >= 0) {
+            retries.count -= 1;
+            ajax.superGet.bind(null, options).defer(1000);
+        } else
+            onerror && onerror.apply(this, argument);
+    }
+    ajax(options);
 }
