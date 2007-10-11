@@ -56,23 +56,16 @@ function ajax(options) {
     loader.load(url);
 }
 
-var ajaxState = {
-    sequenceNumber: 0,
-    handlers: {}
-}
-
 function proxiedAjax(options) {
-    var state = ajaxState,
-        sequenceNumber = state.sequenceNumber++;
     var url = options.url;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
                '_ts=', (new Date).getTime()].join('');
-    state.handlers[sequenceNumber] = {url:url,
-                                      success:options.success,
-                                      failure:options.error};
+    var handlers = {url:url,
+        success:options.success,
+        failure:options.error};
     var options = {
         url: options.url,
         cache: options.cache||false,
@@ -82,14 +75,14 @@ function proxiedAjax(options) {
     };
     if (!options.data) delete options.data;
     if (!options.type) delete options.type;
-    FlashBridge.call('ajaxProxy', sequenceNumber, options);
+    (FlashBridge.call('ajaxProxy', sequenceNumber, options).
+     onreturn(function(record) {
+         handleAjaxResponse(handlers, record.method, record.data);
+     }));
 }
 
-function handleAjaxResponse(sequenceNumber, method, data) {
-    var state = ajaxState,
-        record = state.handlers[sequenceNumber] || {},
-        callback = record[method];
-    delete state.handlers[sequenceNumber];
+function handleAjaxResponse(record, method, data) {
+    var callback = record[method];
     // special cases
     switch (method) {
     case 'success':

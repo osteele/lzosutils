@@ -12,6 +12,8 @@ var FlashBridge = function() {
 //     });
     flash.external.ExternalInterface.addCallback("handleFlashbridgeCallback",
                                                  this, this.handleCallback);
+    flash.external.ExternalInterface.addCallback("handleFlashbridgeException",
+                                                 this, this.handleException);
     this.register('info', function() {info.apply(null,  arguments)});
 }
 
@@ -34,15 +36,16 @@ FlashBridge.prototype.call = function(fn) {
     // http://codinginparadise.org/weblog/2005/12/serious-bug-in-flash-8.html
     _root.getURL(expr);
     return modifier = {
-        onsuccess: function(handler) {
+        onreturn: function(handler) {
             if (!callbackRecord)
                 callbacks[callbackId] = callbackRecord = {};
-            callbackRecord.onsuccess = handler;
+            callbackRecord.onreturn = handler;
             return modifier;
         },
-        onerror: function() {
+        onexception: function(handler) {
             if (!callbackRecord)
                 callbacks[callbackId] = callbackRecord = {};
+            callbackRecord.onexception = handler;
             return modifier;
         }
     }
@@ -50,9 +53,16 @@ FlashBridge.prototype.call = function(fn) {
 
 FlashBridge.prototype.handleCallback = function(callbackId, result) {
     var handlers = this.callbacks[callbackId],
-        onsuccess = (handlers||{}).onsuccess;
+        onreturn = (handlers||{}).onreturn;
     delete this.callbacks[callbackId];
-    onsuccess && onsuccess(result)
+    onreturn && onreturn(result)
+}
+
+FlashBridge.prototype.handleException = function(callbackId, result) {
+    var handlers = this.callbacks[callbackId],
+        onexception = (handlers||{}).onexception;
+    delete this.callbacks[callbackId];
+    onexception && onexception(result)
 }
 
 FlashBridge = new FlashBridge();
