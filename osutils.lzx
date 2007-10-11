@@ -5,6 +5,7 @@
   <script src="processes.js"/>
   <script src="layout-utils.js"/>
   <script src="osutils.js"/>
+  <script src="flashbridge.js"/>
   <script src="ajax.js"/>
   <script src="draw-utils.js"/>
   <script src="view-utils.js"/>

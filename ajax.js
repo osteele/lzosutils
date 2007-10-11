@@ -25,7 +25,7 @@ function ajax(options) {
     var url = options.url,
         onsuccess = options.success,
         onerror = options.error;
-    url||error('no url');
+    url || error('no url');
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
     if (options.data) {
@@ -63,8 +63,7 @@ var ajaxState = {
 
 function proxiedAjax(options) {
     var state = ajaxState,
-        sequenceNumber = state.sequenceNumber++,
-        externalInterface = flash.external.ExternalInterface;
+        sequenceNumber = state.sequenceNumber++;
     var url = options.url;
     if (url.indexOf('http') != 0)
         url = gHostPrefix + url;
@@ -83,7 +82,7 @@ function proxiedAjax(options) {
     };
     if (!options.data) delete options.data;
     if (!options.type) delete options.type;
-    externalInterface.call("ajaxProxy", sequenceNumber, options);
+    FlashBridge.call('ajaxProxy', sequenceNumber, options);
 }
 
 function handleAjaxResponse(sequenceNumber, method, data) {
@@ -113,9 +112,9 @@ if (htmlProxy) {
 
 ajax.get = function(url, params, onsuccess, onerror) {
     if (typeof params == 'function') {
+        onerror = onsuccess;
+        onsuccess = params;
         params = {};
-        onsuccess = arguments[1];
-        onerror = arguments[2];
     }
     ajax({url:url, data:params, success:onsuccess, error:onerror});
 }

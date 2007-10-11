@@ -90,6 +90,5 @@ LzView.prototype.smoothBitmap = function() {
         bitmap = this.bitmap =
         new flash.display.BitmapData(mc._width, mc._height, true, 0x00000000);
     bitmap.draw(mc);
-    info(mc._width, mc._height);
     mc.attachBitmap(bitmap, mc.getNextHighestDepth(), 'always', true);
 }
