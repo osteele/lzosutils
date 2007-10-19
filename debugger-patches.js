@@ -1,10 +1,6 @@
-function $reportUndefinedVariable() {
-#pragma "warnUndefinedReferences=false"
-}
+function $reportUndefinedVariable() {}
 
-function $reportUndefinedProperty() {
-#pragma "warnUndefinedReferences=false"
-}
+function $reportUndefinedProperty() {}
 
 function $reportUndefinedObjectProperty (filename, lineNumber, propertyName) {
 #pragma "warnUndefinedReferences=false"

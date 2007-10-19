@@ -165,7 +165,8 @@ LzView.prototype.getAbsoluteBounds = function(container) {
         right = Math.min(right, cb.x + cb.width);
         bottom = Math.min(bottom, cb.y + cb.height);
     }
-    return {x:left, y:top, width:right-left, height:bottom-top,
+    return {x:left, y:top,
+            width:right-left, height:bottom-top,
             right:right, bottom:bottom};
 }
 
