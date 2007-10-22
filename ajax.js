@@ -75,7 +75,7 @@ function proxiedAjax(options) {
     };
     if (!options.data) delete options.data;
     if (!options.type) delete options.type;
-    (FlashBridge.call('ajaxProxy', sequenceNumber, options).
+    (FlashBridge.call('ajaxProxy', options).
      onreturn(function(record) {
          handleAjaxResponse(handlers, record.method, record.data);
      }));
