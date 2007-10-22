@@ -34,7 +34,10 @@ FlashBridge.prototype.call = function(fn) {
         expr = ['javascript:FlashBridge.handle("', fn, '",', callbackId, ',', JSON.stringify(args), ')'].join('');
     // avoid ExternalInterface, because of the bugs in
     // http://codinginparadise.org/weblog/2005/12/serious-bug-in-flash-8.html
-    _root.getURL(expr);
+    //info(expr);
+    //_root.getURL(expr);
+    //myfs(fn, JSON.stringify(args));
+    throttledGetURL(expr);
     return modifier = {
         onreturn: function(handler) {
             if (!callbackRecord)
@@ -50,6 +53,12 @@ FlashBridge.prototype.call = function(fn) {
         }
     }
 }
+
+function throttledGetURL(expr) {
+    _root.getURL(expr);
+}
+throttledGetURL = throttledGetURL.throttled(100);
+
 
 FlashBridge.prototype.handleCallback = function(callbackId, result) {
     var handlers = this.callbacks[callbackId],
