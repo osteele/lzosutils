@@ -47,3 +47,10 @@ Debug.toBrowserConsole = function(flag) {
 
 if (false)
     Debug.toBrowserConsole();
+
+var console = {
+    info: info,
+    debug: debug,
+    warn: warn,
+    error: error
+}

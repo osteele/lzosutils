@@ -1,28 +1,5 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
-var Options = {};
-
-// LzBrowser.getLoadURL().split('?').last().split('&').each(function(item) {
-//     var split = item.split('=', 2),
-//         key = split[0],
-//         value = split.length > 1 ? split[1] : true;
-//     if (value == 'false')
-//         value = false;
-//     options[key] = value;
-// });
-
-function InitializeOptions() {
-    var options = Options;
-    for (var name in _root) {
-        var value = _root[name];
-        if (typeof value == 'string')
-            options[name] = value != 'false' && value;
-    }
-}
-
-InitializeOptions();
-
-
 /*
  * Functions
  */

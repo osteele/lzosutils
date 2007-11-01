@@ -67,6 +67,14 @@ String.prototype.replace = String.prototype.replace || function(pattern, sub) {
     return segments.join('');
 }
 
+String.prototype.startsWith = function(prefix) {
+    return this.indexOf(prefix) == 0;
+}
+
+String.prototype.endsWith = function(suffix) {
+    return this.lastIndexOf(suffix) == this.length - suffix.length;
+}
+
 String.prototype.strip = function() {
     var i, j, ws = " \t\n\r";
     for (j = this.length; --j >= 0 && ws.indexOf(this.charAt(j)) >= 0; )

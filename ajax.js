@@ -139,5 +139,3 @@ ajax.superGet = function(options) {
     }
     ajax(options);
 }
-
-ajax.get('/report', {network:Options.network, host:gHost, n:network});
