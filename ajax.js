@@ -1,20 +1,5 @@
 /* Copyright 2007 by Oliver Steele.  All rights reserved. */
 
-var gHostPrefix = 'http://styleandshare.com';
-var gImageHostPrefix = 'http://images.styleandshare.com';
-var gStaticHostPrefix = 'http://static.styleandshare.com';
-
-if (Options.network == 'development' || !Options.network) {
-    gHost = 'zardoz.dev';
-    gHostPrefix = 'http://' + gHost;
-    gImageHostPrefix = gHostPrefix;
-    gStaticHostPrefix = gHostPrefix;
-} else if (Options.network == 'staging') {
-    gHostPrefix = 'http://staging.styleandshare.com';
-    gStaticHostPrefix = 'http://static.staging.styleandshare.com';
-}
-
-LzLoadQueue.maxOpen = 10000;
 //LzLoadQueue.__LZmonitorState = true;
 
 /*
@@ -22,12 +7,14 @@ LzLoadQueue.maxOpen = 10000;
  */
 
 function ajax(options) {
+    ajax.setup && ajax.setup(options);
     var url = options.url,
         onsuccess = options.success,
         onerror = options.error;
     url || error('no url');
-    if (url.indexOf('http') != 0)
-        url = gHostPrefix + url;
+    url.startsWith('report') && error('report', url);
+    url || error('null url', url);
+    String(url) == null && error('nn', url);
     if (options.data) {
         var query = Hash.toQueryString(options.data);
         if (query.length) {
@@ -57,9 +44,8 @@ function ajax(options) {
 }
 
 function proxiedAjax(options) {
+    ajax.setup && ajax.setup(options);
     var url = options.url;
-    if (url.indexOf('http') != 0)
-        url = gHostPrefix + url;
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
                '_ts=', (new Date).getTime()].join('');
@@ -153,3 +139,5 @@ ajax.superGet = function(options) {
     }
     ajax(options);
 }
+
+ajax.get('/report', {network:Options.network, host:gHost, n:network});
