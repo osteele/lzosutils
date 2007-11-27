@@ -11,10 +11,6 @@ function ajax(options) {
     var url = options.url,
         onsuccess = options.success,
         onerror = options.error;
-    url || error('no url');
-    url.startsWith('report') && error('report', url);
-    url || error('null url', url);
-    String(url) == null && error('nn', url);
     if (options.data) {
         var query = Hash.toQueryString(options.data);
         if (query.length) {
