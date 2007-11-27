@@ -5,7 +5,7 @@ Function.K = function(x) {return function(){return x}};
 
 Function.prototype.bind = function(thisObject) {
     var fn = this,
-        args = [].slice.call(arguments, 1);
+        args = Array.slice(arguments, 1);
     return function() {
         return fn.apply(thisObject, args.concat([].slice.apply(arguments, 1)));
     }
@@ -13,7 +13,7 @@ Function.prototype.bind = function(thisObject) {
 
 Function.prototype.compose = function(other) {
     var fn = this,
-        args = [].slice.call(arguments, 1);
+        args = Array.slice(arguments, 1);
     return function() {
         var v = other.apply(this, arguments);
         return fn.call(this, v);
@@ -60,9 +60,9 @@ function isInstanceOf(klass) {
 
 // Returns a projection \x -> \x[name](args...)
 function invoke(name, args) {
-    args = [].slice.call(args, 0);
+    args = Array.slice(args, 0);
     return function(object) {
-        return object[name].apply(object, args.concat([].slice.call(arguments, 0)));
+        return object[name].apply(object, args.concat(Array.slice(arguments, 0)));
     }
 }
 

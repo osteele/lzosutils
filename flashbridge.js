@@ -26,7 +26,7 @@ FlashBridge.prototype.register = function(name, thisObject, fn) {
 }
 
 FlashBridge.prototype.call = function(fn) {
-    var args = [].slice.call(arguments, 1),
+    var args = Array.slice(arguments, 1),
         callbacks = this.callbacks,
         callbackId = ++this.callbackId,
         callbackRecord = null,

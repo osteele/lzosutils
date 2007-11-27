@@ -86,7 +86,7 @@ Array.prototype.contains = Array.prototype.find;
 
 Array.prototype.invoke = function(name) {
     var result = new Array(this.length);
-    var args = [].slice.call(arguments, 1);
+    var args = Array.slice(arguments, 1);
     this.forEach(function(item, ix) {
         result[ix] = item[name].apply(item, args);
     });
@@ -121,6 +121,13 @@ Array.prototype.without = function(item) {
 /*
  * Other array extensions
  */
+
+Array.slice = (function() {
+    var slice = Array.prototype.slice;
+    return function(array) {
+        return slice.apply(array, slice(arguments, 1));
+    }
+})();
 
 Array.prototype.commas = function() {
     return this.join(',');

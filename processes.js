@@ -27,7 +27,7 @@ Function.prototype.throttled = function(interval, options) {
         backoffRatio = options.backoff == true ? 2 : options.backoff;
     return function() {
         var self = this,
-            args = [].slice.call(arguments, 0);
+            args = Array.slice(arguments, 0);
         run.defer();
         function run() {
             var now = new Date,
