@@ -17,12 +17,14 @@ function __debug_message(level, args) {
     Debug.write.apply(Debug, [level].concat(args));
 }
 
-function info() {__debug_message('info', arguments); return arguments[0]}
-function debug() {__debug_message('debug', arguments)}
-function warn() {Debug.warn.apply(Debug, arguments)}
-function error() {Debug.error.apply(Debug, arguments)}
+var console = {
+    info: function() {__debug_message('info', arguments); return arguments[0]},
+    debug: function() {__debug_message('debug', arguments)},
+    warn: function() {Debug.warn.apply(Debug, arguments)},
+    error: function() {Debug.error.apply(Debug, arguments)}
+}
 
-Debug.toBrowserConsole = function(flag) {
+console.toBrowserConsole = function(flag) {
     var options = arguments.callee;
     flag = Boolean(flag == undefined ? true : flag);
     if (options['installed'] == flag)
@@ -33,24 +35,14 @@ Debug.toBrowserConsole = function(flag) {
         // fn call to create new bindings
         install(names[i]);
     function install(name) {
-        var basis = global[name],
+        var basis = console[name],
             reporter = 'console.' + name;
-        global[name] = around;
+        console[name] = around;
         function around() {
             basis.apply(this, arguments);
-            var expr = ['window.console&&', reporter, '&&', reporter, '(',
-                JSON.stringify(arguments), ')'].join('');
+            var expr = ['window.console&&', reporter, '&&',
+                reporter, '(', JSON.stringify(arguments), ')'].join('');
             LzBrowser.loadJS(expr);
         }
     }
-}
-
-if (false)
-    Debug.toBrowserConsole();
-
-var console = {
-    info: info,
-    debug: debug,
-    warn: warn,
-    error: error
 }
