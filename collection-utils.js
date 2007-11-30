@@ -125,7 +125,7 @@ Array.prototype.without = function(item) {
 Array.slice = (function() {
     var slice = Array.prototype.slice;
     return function(array) {
-        return slice.apply(array, slice(arguments, 1));
+        return slice.apply(array, slice.call(arguments, 1));
     }
 })();
 
