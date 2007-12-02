@@ -4,13 +4,19 @@
   Download: http://osteele.com/sources/openlaszlo/simple-logging.js
   License: MIT License.
 
-  This file defines +info+, +warn+, +error+, and +debug+ functions
-  that are compatible with those defined in
-  {readable.js}[http://osteele.com/sources/javascript/readable.js],
-  {inline-console.js}[http://osteele.com/sources/javascript/inline-console.js],
-  and fvlogger[http://www.alistapart.com/articles/jslogging].  This
-  allows libraries that use these functions to be used in both
-  OpenLaszlo programs and in DHTML.
+  This file defines +console.info+, +console.warn+, +console.error+, and
+  +console.debug+ functions that are compatible with those define by
+  many HTTP user agents (for example, Firefox with Firebug; and Safari 3.0).
+  This allows libraries that use these functions to be used in both
+  OpenLaszlo programs and in browser JavaScript.
+
+  This file also defines a function, +console.toBrowserConsole+, that
+  additionally routes the arguments to these functions to arguments
+  with the same name in the browser JavaScript.  For example, after
+  +console.toBrowserConsole()+ is called, +console.info('arg')+ will
+  both write +'arg'+ to the OpenLaszlo Debug console (if the application
+  is compiled with the debug switch), and invoke +console.info('arg')+
+
 */
 
 function __debug_message(level, args) {
@@ -32,17 +38,29 @@ console.toBrowserConsole = function(flag) {
     options.installed = flag;
     var names = ['info', 'debug', 'warn', 'error'];
     for (var i = 0; i < names.length; i++)
-        // fn call to create new bindings
         install(names[i]);
+    // use an fn to create a new binding for each iteration
     function install(name) {
         var basis = console[name],
-            reporter = 'console.' + name;
+            reportfn = 'console.' + name;
         console[name] = around;
         function around() {
             basis.apply(this, arguments);
-            var expr = ['window.console&&', reporter, '&&',
-                reporter, '(', JSON.stringify(arguments), ')'].join('');
-            LzBrowser.loadJS(expr);
+            var argstrs = [];
+            for (var i = 0; i < arguments.length; i++)
+                argstrs.push(JSON.stringify(arguments[i]));
+            var expr = [
+                'javascript:window.console&&typeof ', reportfn, '=="function"&&',
+                reportfn, '(', argstrs.join(','), ')'
+            ].join('');
+            getURL(expr);
         }
+    }
+    var nextTime = 0;
+    function getURL(expr) {
+        var now = (new Date).getTime();
+        if (now < nextTime)
+            return setTimeout(function(){_root.getURL(expr)}, nextTime - now);
+        nextTime = now + 1000;
     }
 }
