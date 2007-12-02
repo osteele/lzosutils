@@ -7,6 +7,8 @@
 
 function ajax(options) {
     ajax.setup && ajax.setup(options);
+    if (options.proxied)
+        return ajax.proxied(options);
     var url = options.url,
         onsuccess = options.success,
         onerror = options.error;
@@ -17,7 +19,7 @@ function ajax(options) {
             url += query;
         }
     }
-    ajax.trace && Debug.write('XHR', url);
+    ajax.trace && console.info('XHR', url);
     // add timestamp
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
@@ -25,21 +27,20 @@ function ajax(options) {
     var loader = new LoadVars();
     loader.onLoad = function(success) {
         if (!success)
-            onerror ? onerror() : Debug.error(url);
+            onerror ? onerror() : console.error(url);
     }
     loader.onData = function(data) {
         data = data && data.strip();
         var json = data && JSON.parse(data);
         ajax.lastResult = {url:url, json:json, data:data};
         if ((data && !json) || data == undefined)
-            return onerror ? onerror() : Debug.error(url);
+            return onerror ? onerror() : console.error(url);
         onsuccess && onsuccess(json);
     };
     loader.load(url);
 }
 
-function proxiedAjax(options) {
-    ajax.setup && ajax.setup(options);
+ajax.proxied = function(options) {
     var url = options.url;
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
@@ -59,13 +60,13 @@ function proxiedAjax(options) {
     // get the defaults
     if (!options.data) delete options.data;
     if (!options.type) delete options.type;
-    (FlashBridge.call('ajaxProxy', options).
-     onreturn(function(record) {
-         handleAjaxResponse(handlers, record.method, record.data);
-     }));
+    FlashBridge.call('ajaxProxy', options).
+    onreturn(function(record) {
+        ajax.handleProxiedResponse(handlers, record.method, record.data);
+    });
 }
 
-function handleAjaxResponse(record, method, data) {
+ajax.handleProxiedResponse = function(record, method, data) {
     var callback = record[method];
     // special cases
     switch (method) {
@@ -75,15 +76,10 @@ function handleAjaxResponse(record, method, data) {
         break;
     case 'error':
         // report an error if the caller isn't going to
-        callback || Debug.error(record.url);
+        callback || console.error(record.url);
         break;
     }
     callback && callback(data);
-}
-
-if (htmlProxy) {
-    FlashBridge.register('handleAjaxResponse', handleAjaxResponse);
-    ajax = proxiedAjax;
 }
 
 ajax.get = function(url, params, onsuccess, onerror) {
