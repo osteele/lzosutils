@@ -1,6 +1,6 @@
 <canvas>
   <include href="debugging.lzx"/>
-  <include href="osutils.lzx"/>
+  <include href="library.lzx"/>
 
   <view id="v" width="100" height="200" bgcolor="#fef" align="center" valign="middle"/>
 

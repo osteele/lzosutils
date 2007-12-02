@@ -1,3 +1,15 @@
+// returns a function that waits ms before calling the
+// underlying function.
+Function.prototype.eventually = function(ms) {
+    var fn = this;
+    return function() {
+        var self = this,
+            args = Array.slice(arguments, 0);
+        run.defer(ms);
+        function run(){fn.apply(self, args)};
+    }
+}
+
 loadImage.active = 0;
 loadImage.queue = [];
 loadImage.limited = function(url, options) {

@@ -1,6 +1,6 @@
 <canvas title="Test best positions">
   <include href="debugging.lzx"/>
-  <include href="osutils.lzx"/>
+  <include href="library.lzx"/>
 
   <view id="neighbor" width="200" height="300" bgcolor="green"
         opacity=".5"

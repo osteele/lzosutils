@@ -1,4 +1,4 @@
-/* Copyright 2007 by Oliver Steele.  All rights reserved. */
+/* Copyright 2007 by Oliver Steele.  Available under the MIT License. */
 
 /*
  * Timing
