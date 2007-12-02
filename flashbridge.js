@@ -4,9 +4,11 @@
  * JS Bridge
  */
 
-var FlashBridge = function() {
+var FlashBridge = {};
+
+FlashBridge.initialize = function() {
     this.callbacks = {};
-    this.callbackId = 0;
+    this.nextSequenceNumber = 0;
     var ExternalInterface = flash.external.ExternalInterface;
     ExternalInterface.addCallback("handleFlashbridgeCallback",
                                   this, this.handleCallback);
@@ -14,58 +16,80 @@ var FlashBridge = function() {
                                   this, this.handleException);
 }
 
-FlashBridge.prototype.register = function(name, thisObject, fn) {
-    if (!fn) {
-        fn = thisObject;
-        thisObject = null;
-    }
+FlashBridge.register = function(name, thisObject, fn) {
+    if (!fn)
+        return this.register(name, null, thisObject);
     flash.external.ExternalInterface.addCallback(name, thisObject, fn);
 }
 
-FlashBridge.prototype.call = function(fname) {
+FlashBridge.call = function(fname) {
     var args = Array.slice(arguments, 1),
         callbacks = this.callbacks,
-        callbackId = ++this.callbackId,
+        sequenceNumber = this.nextSequenceNumber++,
         callbackRecord = null,
         modifier,
-        expr = ['javascript:FlashBridge.handle("', fname, '",', callbackId, ',', JSON.stringify(args), ')'].join('');
-    // avoid ExternalInterface, because of the bugs in
+        expr = [
+            'FlashBridge.handle("', fname, '",', sequenceNumber, ',',
+            JSON.stringify(args), ')'
+        ].join('');
+    // don't use ExternalInterface to make the call, because of the bugs in
     // http://codinginparadise.org/weblog/2005/12/serious-bug-in-flash-8.html
-    throttledGetURL(expr);
+    LzBrowser.exec(expr);
     return modifier = {
         onreturn: function(handler) {
             if (!callbackRecord)
-                callbacks[callbackId] = callbackRecord = {};
+                callbacks[sequenceNumber] = callbackRecord = {};
             callbackRecord.onreturn = handler;
             return modifier;
         },
         onexception: function(handler) {
             if (!callbackRecord)
-                callbacks[callbackId] = callbackRecord = {};
+                callbacks[sequenceNumber] = callbackRecord = {};
             callbackRecord.onexception = handler;
             return modifier;
         }
     }
 }
 
-function throttledGetURL(expr) {
-    _root.getURL(expr);
-}
-throttledGetURL = throttledGetURL.throttled(100);
-
-
-FlashBridge.prototype.handleCallback = function(callbackId, result) {
-    var handlers = this.callbacks[callbackId],
+FlashBridge.handleCallback = function(sequenceNumber, result) {
+    var handlers = this.callbacks[sequenceNumber],
         onreturn = (handlers||{}).onreturn;
-    delete this.callbacks[callbackId];
+    delete this.callbacks[sequenceNumber];
     onreturn && onreturn(result)
 }
 
-FlashBridge.prototype.handleException = function(callbackId, result) {
-    var handlers = this.callbacks[callbackId],
+FlashBridge.handleException = function(sequenceNumber, result) {
+    var handlers = this.callbacks[sequenceNumber],
         onexception = (handlers||{}).onexception;
-    delete this.callbacks[callbackId];
+    delete this.callbacks[sequenceNumber];
     onexception && onexception(result)
 }
 
-FlashBridge = new FlashBridge();
+
+/*
+ * Utilities
+ */
+
+Array.slice = (function() {
+    var slice = Array.prototype.slice;
+    return function(array) {
+        return slice.apply(array, slice.call(arguments, 1));
+    }
+})();
+
+LzBrowser.exec = function(expr) {
+    var nextTime = arguments.callee.nextTime || 0,
+        now = (new Date).getTime();
+    if (now < nextTime)
+        return setTimeout(function(){LzBrowser.exec(expr)},
+                          nextTime - now);
+    _root.getURL('javascript:'+expr);
+    arguments.callee.nextTime = now + 100;
+}
+
+
+/*
+ * Initialization
+ */
+
+FlashBridge.initialize();

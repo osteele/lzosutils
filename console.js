@@ -43,24 +43,26 @@ console.toBrowserConsole = function(flag) {
     function install(name) {
         var basis = console[name],
             reportfn = 'console.' + name;
-        console[name] = around;
-        function around() {
+        console[name] = function() {
             basis.apply(this, arguments);
             var argstrs = [];
             for (var i = 0; i < arguments.length; i++)
                 argstrs.push(JSON.stringify(arguments[i]));
             var expr = [
-                'javascript:window.console&&typeof ', reportfn, '=="function"&&',
+                'window.console&&typeof ', reportfn, '=="function"&&',
                 reportfn, '(', argstrs.join(','), ')'
             ].join('');
-            getURL(expr);
+            LzBrowser.exec(expr);
         }
     }
-    var nextTime = 0;
-    function getURL(expr) {
-        var now = (new Date).getTime();
-        if (now < nextTime)
-            return setTimeout(function(){_root.getURL(expr)}, nextTime - now);
-        nextTime = now + 1000;
-    }
+}
+
+LzBrowser.exec = function(expr) {
+    var nextTime = arguments.callee.nextTime || 0,
+        now = (new Date).getTime();
+    if (now < nextTime)
+        return setTimeout(function(){LzBrowser.exec(expr)},
+                          nextTime - now);
+    _root.getURL('javascript:'+expr);
+    arguments.callee.nextTime = now + 100;
 }

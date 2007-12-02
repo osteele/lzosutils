@@ -1,4 +1,4 @@
-/* Copyright 2007 by Oliver Steele.  All rights reserved. */
+/* Copyright 2007 by Oliver Steele.  Available under the MIT License. */
 
 /*
  * JavaScript 1.6 Array extensions
@@ -138,17 +138,12 @@ Array.prototype.last = function() {
     return length ? this[length-1] : null;
 }
 
-
-/*
- * Array Monad
- */
-
-Array.toArray = function(ar) {
-    return ar instanceof Array ? ar : [ar];
+Array.toArray = function(array) {
+    return array instanceof Array ? array : [array];
 }
 
-Array.fromArray = function(ar) {
-    return ar instanceof Array ? ar[0] : ar;
+Array.fromArray = function(array) {
+    return array instanceof Array ? array[0] : array;
 }
 
 
@@ -158,17 +153,22 @@ Array.fromArray = function(ar) {
 
 var Hash = {};
 
-function $H(data) {
-    return {
-        each: function() {return Hash.each(data)},
-        keys: function() {return Hash.keys(data)},
-        merge: function(other) {return Hash.merge(data, other)},
-        toQueryString: function() {return Hash.toQueryString(data)},
-        values: function() {return Hash.values(data)},
-        // non-prototype
-        compact: function() {return Hash.compact(data)},
-        items: function() {return Hash.items(data)}
-    };
+function $H(properties) {
+    // this is (a lot) less efficient but more maintainable than just
+    // returning {each:function(){return Hash.each(p)}, ...}
+    var hash = {},
+        dummy = {},
+        unshift = Array.prototype.unshift;
+    for (var name in Hash)
+        dummy[name] || addMethod(name);
+    return hash;
+    function addMethod(name) {
+        var fn = Hash[name];
+        hash[name] = function() {
+            unshift.call(arguments, properties);
+            return fn.apply(Hash, arguments);
+        }
+    }
 }
 
 Hash.each = function(hash, fn) {

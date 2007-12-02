@@ -1,6 +1,5 @@
-/* Copyright 2007 by Oliver Steele.  Released under the MIT License. */
+/* Copyright 2007 by Oliver Steele.  Available under the MIT License. */
 
-//LzLoadQueue.__LZmonitorState = true;
 
 /*
  * AJAX
@@ -18,7 +17,7 @@ function ajax(options) {
             url += query;
         }
     }
-    Debug.write('XHR', url);
+    ajax.trace && Debug.write('XHR', url);
     // add timestamp
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
@@ -45,16 +44,19 @@ function proxiedAjax(options) {
     if (!options.cache)
         url = [url, url.indexOf('?') >= 0 ? '&' : '?',
                '_ts=', (new Date).getTime()].join('');
-    var handlers = {url:url,
-        success:options.success,
-        failure:options.error};
+    var handlers = {
+        url: url,               // for debugging
+        success: options.success,
+        failure: options.error
+    };
     var options = {
         url: options.url,
-        cache: options.cache||false,
+        cache: options.cache || false,
         data: options.data,
         dataType: 'json',
         type: options.type
     };
+    // get the defaults
     if (!options.data) delete options.data;
     if (!options.type) delete options.type;
     (FlashBridge.call('ajaxProxy', options).
@@ -80,9 +82,8 @@ function handleAjaxResponse(record, method, data) {
 }
 
 if (htmlProxy) {
+    FlashBridge.register('handleAjaxResponse', handleAjaxResponse);
     ajax = proxiedAjax;
-    flash.external.ExternalInterface.addCallback("handleAjaxResponse",
-                                                 null, handleAjaxResponse);
 }
 
 ajax.get = function(url, params, onsuccess, onerror) {
