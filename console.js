@@ -5,32 +5,28 @@
   License: MIT License.
 
   This file defines +console.info+, +console.warn+, +console.error+, and
-  +console.debug+ functions that are compatible with those define by
+  +console.debug+ functions that are compatible with those defined by
   many HTTP user agents (for example, Firefox with Firebug; and Safari 3.0).
   This allows libraries that use these functions to be used in both
   OpenLaszlo programs and in browser JavaScript.
 
-  This file also defines a function, +console.toBrowserConsole+, that
+  This file also defines a function, +console.teeToBrowser+, that
   additionally routes the arguments to these functions to arguments
   with the same name in the browser JavaScript.  For example, after
-  +console.toBrowserConsole()+ is called, +console.info('arg')+ will
+  +console.teeToBrowsera()+ is called, +console.info('arg')+ will
   both write +'arg'+ to the OpenLaszlo Debug console (if the application
   is compiled with the debug switch), and invoke +console.info('arg')+
-
+  within the browser.
 */
 
-function __debug_message(level, args) {
-    Debug.write.apply(Debug, [level].concat(args));
-}
-
 var console = {
-    info: function() {__debug_message('info', arguments); return arguments[0]},
-    debug: function() {__debug_message('debug', arguments)},
-    warn: function() {Debug.warn.apply(Debug, arguments)},
-    error: function() {Debug.error.apply(Debug, arguments)}
+    info: function() {Debug.write.apply(Debug, arguments); return arguments[0]},
+    debug: function() {Debug.write.apply(Debug, ['debug'].concat(arguments))},
+    warn: function() {Debug.warn(arguments.length > 1 ? arguments.join(', ') : arguments[0])},
+    error: function() {Debug.error(arguments.length > 1 ? arguments.join(', ') : arguments[0])}
 }
 
-console.toBrowserConsole = function(flag) {
+console.teeToBrowser = function(flag) {
     var options = arguments.callee;
     flag = Boolean(flag == undefined ? true : flag);
     if (options['installed'] == flag)
@@ -57,6 +53,8 @@ console.toBrowserConsole = function(flag) {
     }
 }
 
+// Execute javascript in the browser.  Throttled to avoid race
+// condition with MSIE.
 LzBrowser.exec = function(expr) {
     var nextTime = arguments.callee.nextTime || 0,
         now = (new Date).getTime();

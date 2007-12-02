@@ -77,6 +77,8 @@ Array.slice = (function() {
     }
 })();
 
+// Execute javascript in the browser.  Throttled to avoid race
+// condition with MSIE.
 LzBrowser.exec = function(expr) {
     var nextTime = arguments.callee.nextTime || 0,
         now = (new Date).getTime();
