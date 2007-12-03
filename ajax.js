@@ -13,7 +13,8 @@ function ajax(options) {
         onsuccess = options.success,
         onerror = options.error,
         loader = new LoadVars,
-        post = options.type.toUpperCase()=='POST';
+        post = options.type && options.type.toUpperCase()=='POST',
+        dataType = options.dataType || 'json';
     if (post) {
         var sender = new LoadVars;
         for (var name in options.data)
@@ -34,13 +35,24 @@ function ajax(options) {
         if (!success)
             onerror ? onerror() : console.error(url);
     }
-    loader.onData = function(data) {
-        data = data && data.strip();
-        var json = data && JSON.parse(data);
-        ajax.lastResult = {url:url, json:json, data:data};
-        if ((data && !json) || data == undefined)
-            return onerror ? onerror() : console.error(url);
-        onsuccess && onsuccess(json);
+    loader.onData = function(response) {
+        ajax.lastResult = {url:url, response:response};
+        var result = response;
+        switch (dataType) {
+        case 'html':
+            break;
+        case 'json':
+            var str = response && response.strip();
+            result = str && JSON.parse(str);
+            if (str && !result || response == undefined)
+                return onerror ? onerror() : console.error(url);
+            break;
+        case 'xml':
+            result = new XML(response);
+            break;
+        }
+        ajax.lastResult.result = result;
+        onsuccess && onsuccess(result);
     };
     ajax.trace && console.info(post ? 'POST' : 'GET', url);
     post
