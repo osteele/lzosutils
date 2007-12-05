@@ -54,7 +54,14 @@ function ajax(options) {
         ajax.lastResult.result = result;
         onsuccess && onsuccess(result);
     };
-    ajax.trace && console.info(post ? 'POST' : 'GET', url);
+    if (ajax.trace) {
+        console.info(post ? 'POST' : 'GET', url);
+        if (post && options.data) {
+            $H(options.data).each(function(item) {
+                console.info('  ' + item.key + ':', item.value);
+            });
+        }
+    }
     post
         ? sender.sendAndLoad(url, loader, 'POST')
         : loader.load(url);
