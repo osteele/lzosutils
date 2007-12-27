@@ -1,5 +1,5 @@
 <canvas>
-  <script src="draw-utils.js"/>
+  <script src="../src/draw-utils.js"/>
   <drawview width="200" height="100" align="center" valign="middle">
     <method event="oninit">
     beginPath();

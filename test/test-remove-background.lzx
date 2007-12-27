@@ -1,6 +1,6 @@
 <canvas title="Remove background" bgcolor="#ccf">
-  <include href="debugging.lzx"/>
-  <include href="library.lzx"/>
+  <include href="../src/debugging.lzx"/>
+  <include href="../src/library.lzx"/>
 
   <constantlayout axis="y" value="100"/>
   <simplelayout axis="x" spacing="20" inset="10"/>
