@@ -1,13 +1,10 @@
-syntax: glob
-
-working
-
-# temp files
+.DS_Store
 \.\#*
 \#*\#
 *.orig
 .e.scm.*
-.DS_Store
 
 # compiler output
 *.lzx.swf
+
+working
