@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>FlashBridge: Test Proxy</title>
+    <script type="text/javascript" src="swfobject.js"></script>
+    <script type="text/javascript" src="../../lib/flashbridge-browser.js"></script>
+  </head>
+  <body>
+    <div id="applet">
+      <p>The applet did not load.</p>
+    </div>
+    <div id="output">
+    </div>
+    <script type="text/javascript">//<![CDATA[
+      var swfUrl = "test-proxy.lzx?lzt=swf&lzr=swf8";
+      swfobject.embedSWF(swfUrl, "applet", '100%', '50%', '8.0.0');
+      var gReceiver = {
+	h: function() { logCall('h', arguments) },
+	j: function() { logCall('j', arguments) }
+      };
+      setTimeout(function() {
+        // wait a frame, for swfobject to do its thing
+	FlashBridge.initialize('applet');
+	FlashBridge.synchronize();
+	var proxy = FlashBridge.createRemoteProxy('gReceiver', ['f', 'g']);
+	proxy.f(1, 2);
+	proxy.g(3);
+	proxy.f(4);
+      }, 10);
+      function log() {
+        var msg = Array.prototype.join.call(arguments, ' '),
+	    div = document.createElement('div');
+	div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
+        document.getElementById('output').appendChild(div);
+      }
+      function logCall(fname, args) {
+      var args = Array.prototype.slice.call(args, 0);
+      args.unshift(fname);
+      log.apply(null, args);
+      }
+    //]]></script>
+  </body>
+</html>
