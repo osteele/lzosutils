@@ -1,18 +1,19 @@
 <canvas debug="true">
-  <script src="../../lib/console.js"/>
-  <script src="../../lib/json.js"/>
-  <script src="../../lib/browser-compatibility.js"/>
-  <script src="../../lib/flashbridge-flash.js"/>
-  <debug y="0" height="80%"/>
+  <library href="../../lib/flashbridge.lzx"/>
+  <debug x="0" y="0" width="100%" height="100%"/>
   <script>
-    var proxy = FlashBridge.createRemoteProxy('gReceiver', ['h', 'j']);
-    var gReceiver = {
-      f: function() { console.info('f', arguments.join(',')) },
-      g: function() { console.info('g', arguments.join(',')) }
+    // Set up an object for the browser to call
+    var gAppletObject = {
+      f: function() { console.info('gAppletObject.f', arguments.join(',')) },
+      g: function() { console.info('gAppletObject.g', arguments.join(',')) }
     };
-    console.info('loaded');
-    proxy.h(5, 6);
-    proxy.j(7);
-    proxy.h(8);
+    // Create a proxy to an object in the browser html...
+    var gBrowserObject = FlashBridge.createRemoteProxy(
+      'gBrowserObject',  // its name within the applet
+      ['h', 'j']);       // its methods
+      // ...and call it:
+    gBrowserObject.h(5, 6);
+    gBrowserObject.j(7);
+    gBrowserObject.h(8);
   </script>
 </canvas>

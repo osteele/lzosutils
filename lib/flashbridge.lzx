@@ -1,0 +1,6 @@
+<library>
+  <script src="console.js"/>
+  <script src="browser-compatibility.js"/>
+  <script src="json.js"/>
+  <script src="flashbridge-flash.js"/>
+</library>

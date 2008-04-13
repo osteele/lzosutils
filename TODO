@@ -6,7 +6,7 @@
 
 Tests:
 * slow page (applet loads first)
-* callback
 
 Features:
+* queueing from applet
 * callback from js

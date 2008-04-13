@@ -1,36 +1,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title>FlashBridge: Test Proxy Objects</title>
+    <title>FlashBridge: Test Callbacks</title>
     <script type="text/javascript" src="swfobject.js"></script>
     <script type="text/javascript" src="../../lib/flashbridge-browser.js"></script>
   </head>
   <body>
-    <h2>Calls from the browser into the applet:</h2>
-    <div id="applet">
-      <p>The applet didn't load.</p>
-    </div>
     <h2>Calls from the applet into the browser:</h2>
     <div id="output" style="font-family:monospace">
     </div>
+    <h2>Return values:</h2>
+    <div id="applet">
+      <p>The applet didn't load.</p>
+    </div>
     <script type="text/javascript">//<![CDATA[
       // Load the app, and tell FlashBridge to talk to it
-      var swfUrl = "test-proxy.lzx?lzt=swf&lzr=swf8";
+      var swfUrl = "test-callbacks.lzx?lzt=swf&lzr=swf8";
       swfobject.embedSWF(swfUrl, "applet", '100%', '50%', '8.0.0');
       FlashBridge.initialize('applet');
 
       // Set up an object for the applet to call
       var gBrowserObject = {
-	h: function() { logCall('gBrowserObject.h', arguments) },
-	j: function() { logCall('gBrowserObject.j', arguments) }
+	add: function(a, b) {
+          logCall('gBrowserObject.add', arguments);
+          return a+b;
+        },
+	error: function(msg) {
+          logCall('gBrowserObject.error', arguments);
+          throw msg;
+        }
       };
-      // Create a proxy to an object inside the applet...
-      var gAppletObject = FlashBridge.createRemoteProxy(
-        'gAppletObject',  // its name within the applet
-        ['f', 'g']);      // its methods
-      // ...and call it:
-      gAppletObject.f(1, 2);
-      gAppletObject.g(3);
-      gAppletObject.f(4);
+      FlashBridge.call('gApplication.run');
 
       // Logging, so we can see the output
       function log() {
