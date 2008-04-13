@@ -4,15 +4,13 @@
   <script>
     var gBrowserObject = FlashBridge.createRemoteProxy('gBrowserObject',
       ['add', 'error']);
-    var gApplication = {
-      run: function() {
-	gBrowserObject.add(1, 2).onreturn(function(value) {
-	  console.info('1 + 2 -> ' + value);
-	});
-	gBrowserObject.error('error msg').onexception(function(value) {
-	  console.info('error !> ' + value);
-	});
-      }
+    function run() {
+      gBrowserObject.add(1, 2).onreturn(function(value) {
+	console.info('1 + 2 -> ' + value);
+      });
+      gBrowserObject.error('error msg').onexception(function(value) {
+	console.info('error !> ' + value);
+      });
     }
   </script>
 </canvas>
