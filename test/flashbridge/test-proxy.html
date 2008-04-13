@@ -20,8 +20,8 @@
 
       // Set up an object for the applet to call
       var gBrowserObject = {
-	h: function() { logCall('gBrowserObject.h', arguments) },
-	j: function() { logCall('gBrowserObject.j', arguments) }
+        h: function() { logCall('gBrowserObject.h', arguments) },
+        j: function() { logCall('gBrowserObject.j', arguments) }
       };
       // Create a proxy to an object inside the applet...
       var gAppletObject = FlashBridge.createRemoteProxy(
@@ -35,8 +35,8 @@
       // Logging, so we can see the output
       function log() {
         var msg = Array.prototype.join.call(arguments, ' '),
-	    div = document.createElement('div');
-	div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
+            div = document.createElement('div');
+        div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
         document.getElementById('output').appendChild(div);
       }
       function logCall(fname, args) {

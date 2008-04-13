@@ -20,11 +20,11 @@
 
       // Set up an object for the applet to call
       var gBrowserObject = {
-	add: function(a, b) {
+        add: function(a, b) {
           logCall('gBrowserObject.add', arguments);
           return a+b;
         },
-	error: function(msg) {
+        error: function(msg) {
           logCall('gBrowserObject.error', arguments);
           throw msg;
         }
@@ -34,8 +34,8 @@
       // Logging, so we can see the output
       function log() {
         var msg = Array.prototype.join.call(arguments, ' '),
-	    div = document.createElement('div');
-	div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
+            div = document.createElement('div');
+        div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
         document.getElementById('output').appendChild(div);
       }
       function logCall(fname, args) {

@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>FlashBridge: Test Slow Page Load</title>
+    <script type="text/javascript" src="swfobject.js"></script>
+    <script type="text/javascript" src="../../lib/flashbridge-browser.js"></script>
+  </head>
+  <body>
+    <h2 id="countdown">Loading Applet</h2>
+    <div id="applet">
+      <p>The applet didn't load.</p>
+    </div>
+    <script type="text/javascript">//<![CDATA[
+      var swfUrl = "test-slow-page-load.lzx?lzt=swf&lzr=swf8";
+      swfobject.embedSWF(swfUrl, "applet", '100%', '50%', '8.0.0');
+      log('swfobject.embedSWF');
+      
+      function add(a, b) {
+	log('add');
+	return a+b;
+      }
+      
+      var seconds = 30,
+          startTime = new Date;
+      var thread = setInterval(function() {
+        var remainder = seconds * 1000 - (new Date - startTime);
+        document.getElementById('countdown').innerHTML =
+          'Waiting ' + Math.round(remainder / 1000) + 's to initialize bridge';
+	if (remainder > 0) return;
+	clearInterval(thread);
+        document.getElementById('countdown').innerHTML = 'FlashBridge initialized';
+        FlashBridge.initialize('applet');
+        log('FlashBridge.initialize');
+      }, 1000);
+      
+      function log(message) {
+        console && console.info && console.info(new Date, message);
+      }
+    //]]></script>
+  </body>
+</html>
