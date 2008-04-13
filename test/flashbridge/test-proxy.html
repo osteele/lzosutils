@@ -17,15 +17,11 @@
 	h: function() { logCall('h', arguments) },
 	j: function() { logCall('j', arguments) }
       };
-      setTimeout(function() {
-        // wait a frame, for swfobject to do its thing
-	FlashBridge.initialize('applet');
-	FlashBridge.synchronize();
-	var proxy = FlashBridge.createRemoteProxy('gReceiver', ['f', 'g']);
-	proxy.f(1, 2);
-	proxy.g(3);
-	proxy.f(4);
-      }, 10);
+      FlashBridge.initialize('applet');
+      var proxy = FlashBridge.createRemoteProxy('gReceiver', ['f', 'g']);
+      proxy.f(1, 2);
+      proxy.g(3);
+      proxy.f(4);
       function log() {
         var msg = Array.prototype.join.call(arguments, ' '),
 	    div = document.createElement('div');

@@ -1,33 +1,58 @@
 = LzOsUtils
 
 This package contains a grab-bag of utilities that I've used for
-writing OpenLaszlo applications.  It extensions in these areas:
-* It makes OpenLaszlo JavaScript more like Browser JavaScript.
-* It enhances OpenLaszlo with equivalents to some of the JavaScript
-  libraries such as Prototype (whence the collection methods), and
-  jQuery (whence the +ajax+ methods).
-* It defines a powerful FlashBridge mechanism, for communication
-  between the browser JavaScript and the Flash application
-* Miscellaneous other utility features
+writing OpenLaszlo applications.  It defines extensions in these
+areas:
 
-== Browser Compatibility
 
-* +console+ object: compatible with Firebug; can proxy to browser console
-* browser compatibility: remove spurious warnings
+== Browser JavaScript Compatibility
 
-== JavaScript Library Equivalents
+The +console+ object is compatible with the Firebug +console+ API.  It
+can also proxy console methods to the browser console, for debugging
+applets that have been compiled without the inline OpenLaszlo
+debugger.
 
-More specifically:
+The browser compatibility file removes warnings on reference to an
+undefined property of an object.  I put this warning into OpenLaszlo
+in 2002; it was arguably a mistake then, and is definitely a mistake
+now.  Without it, you can write code more easily, and you can write
+libraris that run in both the browser and OpenLaszlo.
+
+Most of the other files in this package require the console and
+browser compatibility functions in order to run without warnings.
+
+
+== Ajax
+
+The +ajax+ file defines +ajax+, +get+, and +post+ functions with
+jQuery-compatible arguments.  When used with FlashBridge (below), it
+has an option for proxying AJAX calls to the browser, in order to use
+the browser's domain when the Flash application is served from a
+separate CDN.
+
+
+== FlashBridge
+
+FlashBridge is a mechanism for browser<->flash communication.  This
+particular implementation has these properties:
+
+* One component (the Flash application, or the browser JavaScript) can
+  *call any* function, or any method on any object, in the other
+  *component -- you don't have to register objects explicitly.
+
+* This facility also queues calls from the page into the flash applet
+  until the applet has loaded, solving some tricky race conditions.
+
+* You can define a proxy object in one component that delegates calls
+  through the bridge to an object in the other component.
+
+* The Flash application can call with a callback function to receive
+  return values as a continuation.
+
+
+== Other Extensions
+
 * collection methods, compatible with ECMAScript 1.7 and Prototype
-* +ajax+, +get+, and +post+ functions with jQuery-compatible arguments;
-  option for proxying to browser console for cross-domain cookies
-
-== Flash to Browser communication
-
-FlashBridge object for browser<->flash communication with proxy objects
-and async return values
-
-== Other extensions
 * xml syntax for filter effects
 * a grab bag of functional programming methods
 * a grab bag of view, string, and "multithreading" utilities
