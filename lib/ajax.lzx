@@ -1,0 +1,7 @@
+<!-- Include this file to get the ajax, post, and get functions. -->
+<library>
+  <script src="console.js"/>
+  <script src="browser-compatibility.js"/>
+  <script src="json.js"/>
+  <script src="ajax.js"/>
+</library>

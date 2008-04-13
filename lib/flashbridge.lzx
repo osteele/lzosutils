@@ -1,3 +1,5 @@
+<!-- Include this file in the applet, and flashbridge-browser.js 
+     in the browser page, to get the flash bridge. -->
 <library>
   <script src="console.js"/>
   <script src="browser-compatibility.js"/>
