@@ -3,11 +3,15 @@
     <title>FlashBridge: Test Slow Page Load</title>
     <script type="text/javascript" src="swfobject.js"></script>
     <script type="text/javascript" src="../../lib/flashbridge-browser.js"></script>
+    <script type="text/javascript" src="log-calls.js"></script>
   </head>
   <body>
     <h2 id="countdown">Loading Applet</h2>
     <div id="applet">
       <p>The applet didn't load.</p>
+    </div>
+    <h2>Browser log:</h2>
+    <div id="output" style="font-family:monospace">
     </div>
     <script type="text/javascript">//<![CDATA[
       var swfUrl = "test-slow-page-load.lzx?lzt=swf&lzr=swf8";
@@ -15,9 +19,9 @@
       log('swfobject.embedSWF');
       
       function add(a, b) {
-	log('add');
 	return a+b;
       }
+      traceFunction('add');
       
       var seconds = 30,
           startTime = new Date;
@@ -31,10 +35,6 @@
         FlashBridge.initialize('applet');
         log('FlashBridge.initialize');
       }, 1000);
-      
-      function log(message) {
-        console && console.info && console.info(new Date, message);
-      }
     //]]></script>
   </body>
 </html>

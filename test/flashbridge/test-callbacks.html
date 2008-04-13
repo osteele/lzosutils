@@ -3,6 +3,7 @@
     <title>FlashBridge: Test Callbacks</title>
     <script type="text/javascript" src="swfobject.js"></script>
     <script type="text/javascript" src="../../lib/flashbridge-browser.js"></script>
+    <script type="text/javascript" src="log-calls.js"></script>
   </head>
   <body>
     <h2>Calls from the applet into the browser:</h2>
@@ -21,28 +22,13 @@
       // Set up an object for the applet to call
       var gBrowserObject = {
         add: function(a, b) {
-          logCall('gBrowserObject.add', arguments);
           return a+b;
         },
         error: function(msg) {
-          logCall('gBrowserObject.error', arguments);
           throw msg;
         }
       };
-      FlashBridge.call('run');
-
-      // Logging, so we can see the output
-      function log() {
-        var msg = Array.prototype.join.call(arguments, ' '),
-            div = document.createElement('div');
-        div.innerHTML = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quote;');
-        document.getElementById('output').appendChild(div);
-      }
-      function logCall(fname, args) {
-      var args = Array.prototype.slice.call(args, 0);
-      args.unshift(fname);
-      log.apply(null, args);
-      }
+      traceMethods('gBrowserObject');
     //]]></script>
   </body>
 </html>

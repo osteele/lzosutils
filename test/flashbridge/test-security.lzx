@@ -1,0 +1,21 @@
+<canvas debug="true">
+  <library href="../../lib/flashbridge.lzx"/>
+  <debug x="0" y="0" width="100%" height="100%"/>
+  <script>
+    function registeredFunction() {
+      console.info('registeredFunction');
+    }
+    function unregisteredFunction() {
+      console.error('unregisteredFunction');
+    }
+    var gRegisteredObject = {
+      f: function() { console.info('gRegisteredObject.f') }
+    };
+    var gUnregisteredObject = {
+      f: function() { console.error('gUnregisteredObject.f') }
+    };
+    FlashBridge.secure();
+    FlashBridge.allow('registeredFunction');
+    FlashBridge.allow('gRegisteredObject');
+  </script>
+</canvas>
